@@ -1,0 +1,107 @@
+! echo ======================================================
+! echo "MedGen = "
+! echo "Medical Genetics = "
+! echo "           Genetic  Testing Reference      [GTR]"
+! echo "         + Mapped datasources              [UMLS]"
+! echo "         + Genetics Home    Reference      [GHR]"
+! echo "         + GeneReviews"
+! echo "         + Human Phenotype Ontology        [HPO]"
+! echo "         + Clinical Variants               [ClinVar]"
+! echo "         + Unified Medical Language System [UMLS]"
+! echo          
+! echo ======================================================
+! echo ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/README.txt
+
+       ! mkdir -p medgen/mirror 
+       cd medgen/mirror
+
+! echo =================================================
+! echo "Medical Genetics [MedGen]"
+! echo =================================================
+
+WGET_CMD="wget -c -m -nH --cut-dirs=100"
+
+
+! echo "///////////////////////////////"
+! echo "MedGen Concepts (MGCONSO)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MGCONSO.RRF.gz
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MERGED.RRF.gz
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MedGen_CUI_history.txt
+
+! echo "///////////////////////////////"
+! echo "MedGen Definitions (MGDEF)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MGDEF.RRF.gz
+
+
+! echo "///////////////////////////////"
+! echo "MedGen Definitions (MGDEF)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MGDEF.RRF.gz
+
+
+! echo "///////////////////////////////"
+! echo "MedGen Relations (MGREL)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MGREL.RRF.gz
+
+
+! echo "///////////////////////////////"
+! echo "MedGen  Attributes      (MGSAT)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MGSAT.RRF.gz
+
+ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MedGen_CUI_history.txt
+
+
+! echo "///////////////////////////////"
+! echo "MedGen  Human Phenotypes (HPO)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MedGen_HPO_Mapping.txt.gz
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MedGen_HPO_OMIM_Mapping.txt.gz
+
+! echo "///////////////////////////////"
+! echo "MedGen  SemanticType    (MGSTY) "
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/MGSTY.RRF.gz
+
+
+! echo "///////////////////////////////"
+! echo "MedGen Preferred Terms  (NAMES)"
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/NAMES.RRF.gz
+
+
+! echo "///////////////////////////////"
+! echo "MedGen PubMed Annotations!     "
+! echo "///////////////////////////////"
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/pub/medgen/medgen_pubmed_lnk.txt.gz
+
+! echo =================================================
+! echo "Clinical Genetics [ClinGen]"
+! echo =================================================
+
+CLINGEN_BASE_URL="ftp://ftp.ncbi.nlm.nih.gov/pub/dbVar/clingen"
+
+$WGET_CMD $CLINGEN_BASE_URL/ClinGen_gene_curation_list.tsv
+$WGET_CMD $CLINGEN_BASE_URL/ClinGen_region_curation_list.tsv
+
+! echo =================================================
+! echo "OMIM Citations "
+! echo =================================================
+
+$WGET_CMD ftp://ftp.ncbi.nlm.nih.gov/repository/OMIM/pubmed_cited
+
+! echo "/////////////////////////////////////////////////"
+! echo "[NCBI Medical Genetics medgen download complete]" 
+! echo "//////////////////////////////////////////////////"
