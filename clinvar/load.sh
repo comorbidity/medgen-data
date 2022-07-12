@@ -1,3 +1,20 @@
+#!/bin/bash 
+
+source ../common.sh 
+source db.config
+
+echo ======================================================
+echo "clinvar begin" 
+
+$mysql_dataset -e "call DATASET(DATABASE())"
+
+$mysql_dataset -e "call log('readme','DATABASE()')" 
+$mysql_dataset -e "call log('DATABASE()','load')" 
+
+echo ======================================================
+
+$mysql_dataset -e "call log('load_tables.sh','refresh')" 
+
 ## standard terms 
 load_table tsv  disease_names             disease_names
 load_table tsv  gene_condition_source_id  gene_condition_source_id
