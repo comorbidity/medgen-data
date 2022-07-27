@@ -1,0 +1,32 @@
+echo "==========================================================="
+echo "PubTator: human and machine generated variant annotations" 
+echo "==========================================================="
+
+WGET_CMD="wget -c -m -nH --cut-dirs=100"
+BASE_URL="ftp://ftp.ncbi.nlm.nih.gov/pub/lu/PubTator"
+
+mkdir -p PubTator/mirror
+cd PubTator/mirror
+
+echo "////////////////////////////////////////////"
+echo "Each NCBI Annotator produces 2Pubtator output tables"
+
+$WGET_CMD $BASE_URL/readme.txt
+
+$WGET_CMD $BASE_URL/mutation2pubtator.gz
+
+$WGET_CMD $BASE_URL/gene2pubtator.gz
+
+$WGET_CMD $BASE_URL/chemical2pubtator.gz
+
+$WGET_CMD $BASE_URL/disease2pubtator.gz
+
+$WGET_CMD $BASE_URL/species2pubtator.gz
+
+$WGET_CMD $BASE_URL/bioconcepts2pubtator.gz
+
+echo "==========================================================="
+
+echo "////////////////////////////////////////////"
+echo "[ PubTator download complete ]"
+echo "////////////////////////////////////////////"
