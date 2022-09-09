@@ -125,9 +125,6 @@ all-variants
 
 :GTR:
    NCBI Genetic Testing Reference
-   
-:PersonalGenomes:
-   Personal Genomes Project evidence and human annotations
 
    
 all-genes
@@ -161,9 +158,6 @@ all-phenotypes
 :orphanet:
    Rare diseases
 
-:CHV:
-   Consumer Health Vocabulary     
-   
 pubmed
 -------
    PubMed PMID linkages to the above sources   
