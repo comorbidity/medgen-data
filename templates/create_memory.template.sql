@@ -262,6 +262,18 @@ begin
 end//
 delimiter ;
 
+drop procedure if exists utf8_general;
+delimiter //
+create procedure utf8_general( tablename varchar(100))
+begin
+	select concat('alter table ', tablename, ' convert to CHARSET utf8 collate utf8_general_ci') into @idx; 
+	prepare stmt from @idx; execute stmt;
+	
+	call log(tablename, 'utf8_general_ci');
+end//
+delimiter ;
+
+
 drop procedure if exists less20; 
 delimiter // 
 create procedure less20(tablename varchar(100)) 
