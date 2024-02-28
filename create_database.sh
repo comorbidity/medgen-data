@@ -2,7 +2,7 @@
 
 source common.sh 
 
-require   $1 "pick a dataset like ./create_database clinvar" 
+require   $1 "pick a dataset like ./create_database.sh clinvar" 
 
 dbconfig="$1/db.config"
 
