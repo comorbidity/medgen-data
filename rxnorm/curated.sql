@@ -10,9 +10,9 @@ create table curated
 )
 ;    
 
-call log('curated', 'curated.bsv');
+call log('curated', 'curated.tsv');
 
-load data local infile 'curated.bsv' 
+load data local infile 'curated.linux.bsv' 
 into table curated
 fields terminated by '|'
 optionally enclosed by '"' 
@@ -59,8 +59,7 @@ create table RXNCONSO_curated
 select distinct C.* from RXNCONSO as C, curated 
 where C.RXCUI = curated.RXCUI;
 
-call create_index('RXNSTY_curated','RXCUI');
-call create_index('RXNSTY_curated','TUI'); 
+call create_index('RXNCONSO_curated','RXCUI');
 
 -- ##############################################
 call log('RXNCONSO_curated_rela', 'refresh'); 
@@ -195,7 +194,7 @@ drop table if exists expand1_form;
 create table expand1_form
 select distinct RXCUI,RELA, STR from expand1 where RELA in ('form_of', 'has_form') order by RXCUI,RELA, STR ;
 
-call create_index('expand1_doseform ','RXCUI');
+call create_index('expand1_form ','RXCUI');
 
 
 -- ##############################################
@@ -204,3 +203,16 @@ call log('curated', 'done.');
 
 
 -- ./export_bsv.sh rxnorm expand1
+
+-- ./export_bsv.sh rxnorm expand1_consists
+-- ./export_bsv.sh rxnorm expand1_doseform
+-- ./export_bsv.sh rxnorm expand1_form
+-- ./export_bsv.sh rxnorm expand1_ingredient
+-- ./export_bsv.sh rxnorm expand1_ingredients
+-- ./export_bsv.sh rxnorm expand1_isa
+-- ./export_bsv.sh rxnorm expand1_tradename
+
+-- ./export_bsv.sh rxnorm expand1_cui
+-- ./export_bsv.sh rxnorm expand1_cui_str
+-- ./export_bsv.sh rxnorm expand1_cui_rela_cui
+-- ./export_bsv.sh rxnorm expand1_cui_rela_str
