@@ -17,7 +17,9 @@ call create_index('RXNSAT','ATN');
 
 call create_index('RXNREL','RXCUI1'); 
 call create_index('RXNREL','RXCUI2');
+call create_index('RXNREL','REL');
 call create_index('RXNREL','RELA');
+call create_index('RXNREL','REL,RELA');
 
 -- #################################################################
 
