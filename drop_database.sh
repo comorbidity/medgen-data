@@ -11,4 +11,4 @@ source  $dbconfig
 
 require $DATASET  "which dataset?" 
 
-mysql -u medgen -pmedgen -e "drop database if exists $DATASET" 
+$mysql_dataset -e "drop database if exists $DATASET" 
