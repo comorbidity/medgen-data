@@ -5,7 +5,7 @@ drop   table if exists MRCONSO_long;
 create table MRCONSO_long
 select distinct * from MRCONSO where length(STR) > 100 order by length(str);
 
-call utf8_unicode('MRCONSO_long');
+call utf8_general('MRCONSO_long');
 call create_index('MRCONSO_long', 'CUI');
 
 update MRCONSO set STR = SUBSTRING(STR, 0, 250) where length(STR) > 255;
@@ -17,7 +17,7 @@ drop   table if exists MRCONSO_snomed;
 create table           MRCONSO_snomed like MRCONSO; 
 insert into            MRCONSO_snomed select * from MRCONSO where SAB like 'SNOMED%'; 
 
-call utf8_unicode('MRCONSO_snomed');
+call utf8_general('MRCONSO_snomed');
 
 -- ######################################################################
 call log('MRCONSO_loinc', 'refresh');
@@ -26,7 +26,7 @@ drop   table if exists MRCONSO_loinc;
 create table           MRCONSO_loinc like MRCONSO;
 insert into            MRCONSO_loinc select * from MRCONSO where SAB='LNC' and TS in ('S','P'); 
 
-call utf8_unicode('MRCONSO_loinc');
+call utf8_general('MRCONSO_loinc');
 
 -- #################################################################################
 call log('MRCONSO_icd', 'refresh'); 
@@ -35,7 +35,7 @@ drop   table if exists MRCONSO_icd;
 create table           MRCONSO_icd like MRCONSO; 
 insert into            MRCONSO_icd select * from MRCONSO where SAB in ('ICD9CM', 'ICD10', 'ICD10CM', 'ICD10AE'); 
 
-call utf8_unicode('MRCONSO_icd');
+call utf8_general('MRCONSO_icd');
 
 -- #################################################################################################################
 call log('MRCONSO_hpo', 'refresh');
@@ -44,7 +44,7 @@ drop   table if exists MRCONSO_hpo;
 create table           MRCONSO_hpo like MRCONSO;
 insert into            MRCONSO_hpo select * from MRCONSO where SAB = 'HPO';
 
-call utf8_unicode('MRCONSO_hpo');
+call utf8_general('MRCONSO_hpo');
 
 -- #################################################################################
 call log('MRSTY_copy', 'refresh');
@@ -54,7 +54,7 @@ drop table if exists MRSTY_copy;
 create table MRSTY_copy like MRSTY;
 insert into  MRSTY_copy select distinct * from MRSTY order by CUI,TUI asc; 
 
-call utf8_unicode('MRSTY_copy');
+call utf8_general('MRSTY_copy');
 call create_index('MRSTY_copy', 'CUI');
 call create_index('MRSTY_copy', 'TUI');
 call create_index('MRSTY_copy', 'CUI,TUI');
@@ -69,7 +69,7 @@ select distinct C.*, S.TUI, S.STY from MRCONSO C, MRSTY S where C.CUI = S.CUI or
 
 call log('MRCONSO_semtype', 'done');
 
-call utf8_unicode('MRCONSO_semtype');
+call utf8_general('MRCONSO_semtype');
 call create_index('MRCONSO_semtype', 'CUI');
 call create_index('MRCONSO_semtype', 'TUI');
 call create_index('MRCONSO_semtype', 'CUI, TUI'); 
@@ -86,9 +86,9 @@ select count(*) into @total from MRREL;
 
 drop table if exists MRREL_vocab_rel;
 create table MRREL_vocab_rel
-select SL, SAB, RELA, count(*) as cnt, count(*)/@total as prct from MRREL group by RELA order by cnt desc;
+select SL, SAB, RELA, count(*) as cnt, count(*)/@total as prct from MRREL group by SL, SAB, RELA order by cnt desc;
 
-call utf8_unicode('MRREL_freq_rela');
+call utf8_general('MRREL_freq_rela');
 call create_index('MRREL_freq_rela', 'RELA'); 
 
 
@@ -101,7 +101,7 @@ drop table if exists MRREL_freq_rela;
 create table MRREL_freq_rela
 select RELA, count(*) as cnt, count(*)/@total as prct from MRREL group by RELA order by cnt desc;
 
-call utf8_unicode('MRREL_freq_rela');
+call utf8_general('MRREL_freq_rela');
 call create_index('MRREL_freq_rela', 'RELA'); 
 
 -- +--------------------------------------------------------+----------+--------+
@@ -174,7 +174,7 @@ call create_index('MRREL_freq_rela', 'RELA');
 -- ...
 -- | co-occurs_with                                         |    13768 | 0.0002 |
 
-call utf8_unicode('MRREL_freq_rela'); 
+call utf8_general('MRREL_freq_rela'); 
 
 -- #################################################################################
 call log('MRREL_rela', 'begin'); 
@@ -205,7 +205,7 @@ select distinct R.* from MRREL R where R.RELA in
  'entire_anatomy_structure_of','has_entire_anatomy_structure',
  'co-occurs_with');
 
-call utf8_unicode('MRREL_rela');
+call utf8_general('MRREL_rela');
 call create_index('MRREL_rela','RELA');
 call create_index('MRREL_rela','CUI1');
 
@@ -223,7 +223,7 @@ select RELA, count(*) as cnt, count(*)/@total as prct from MRREL_rela group by R
 
 -- ALTER TABLE MRREL_rela_rank ADD rank INT NOT NULL AUTO_INCREMENT PRIMARY KEY; 
 
-call utf8_unicode('MRREL_rela_rank');
+call utf8_general('MRREL_rela_rank');
 call create_index('MRREL_rela_rank','RELA');
 
 -- #################################################################################
@@ -233,7 +233,7 @@ drop table if exists MRCONSO_rela;
 create table MRCONSO_rela
 select distinct C.*, R.RUI, R.RELA from MRCONSO C, MRREL_rela R where C.CUI = R.CUI1;
 
-call utf8_unicode('MRCONSO_rela'); 
+call utf8_general('MRCONSO_rela'); 
 call create_index('MRCONSO_rela', 'CUI');
 call create_index('MRCONSO_rela', 'RELA');
 call create_index('MRCONSO_rela', 'RELA, CUI'); 
@@ -247,7 +247,7 @@ drop   table if exists MRSTY_freq;
 create table           MRSTY_freq
 select TUI,STY, count(*) as cnt, count(*)/@total as prct from MRSTY group by TUI,STY order by cnt desc;
 
-call utf8_unicode('MRSTY_freq');
+call utf8_general('MRSTY_freq');
 call create_index('MRSTY_freq', 'TUI');
 call create_index('MRSTY_freq', 'STY');
 
