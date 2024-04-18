@@ -12,10 +12,10 @@ tramadol
 dihydrocodeine
 naltrexone
 abstral
-triprolidine
+???triprolidineXXX
 tapentadol
 fentanyl
-opium
+???opium
 methadon
 oxymorphone
 hydromorphone
@@ -26,7 +26,9 @@ levorphanol
 fentora
 ibudone
 brontex
-allfen
+???allfen
+allfen-c
+allfen c
 brovex
 conzip
 dilaudid
@@ -50,7 +52,6 @@ hycodan
 ascomp
 z tuss
 m-clear
-cheratussin
 levorfanol
 m-eslon
 infumorph
@@ -64,7 +65,6 @@ penyazocine
 ultracet
 lorcet
 hycet
-tussionext
 reprexain
 opana
 vivitrol
@@ -79,7 +79,15 @@ nucynta
 c-cof
 hydro-pro
 codiclear
-cotuss
+???cotuss
+Decotuss-HD
+Decotuss HD
+Hycotuss
+Hycosin
+Nucotuss
+Vicotuss
+Cotuss-V
+Cotuss V
 merpergan
 dolophine
 mar-cof
@@ -128,7 +136,7 @@ canges xp
 depade
 depodur
 guai-co
-guaiatussin
+???guaiatussin
 guaifen-ac
 guaifen ac
 guaifen-c
@@ -140,7 +148,7 @@ hycomed
 hycosin
 hycotuss
 hydone
-atuss
+???atuss
 co-histine
 co-gesic
 cyclimorph
@@ -160,7 +168,8 @@ hydro-tussin
 hydrocet
 hydrocod
 hydrocof
-bitex
+???bitex
+Bitex oral
 cocet
 codafed
 codahistine
@@ -182,9 +191,8 @@ ms cotin
 actiq
 p-v tussin
 ultram
-pentazocine
 trezix
-zotex
+???zotex
 lortuss
 a-g tussin
 bron-tuss
@@ -285,7 +293,9 @@ vopac
 vitussin
 vanacet
 zamadol
-vidone
+???vidone
+vidone oral
+vidone pill
 xolox
 xodol
 synalgos
@@ -339,7 +349,6 @@ duradyne dhc
 hycotab
 hycomed
 lortab
-tussicaps
 tussionex
 hycodan
 hysingla
@@ -370,7 +379,6 @@ zodryl dac
 zodryl-dac
 zodryl dec
 zodryl-dec
-cheratussin
 statuss green
 brovex cb
 brovex-cb
@@ -389,7 +397,27 @@ atuss hx
 atuss hs
 atuss ms
 atuss mr
+guiatuss ac
+guiatuss dac
+Pluratuss
+Cheratussin AC
 cheratussin dac
+hexatussin
+Dynatuss DF
+Dynatuss HC
+Guaiatussin DAC
+Atuss EX
+Atuss G
+Atuss H
+Atuss M
+Donatussin DC
+Donatussin MAX
+Statuss Oral
+Nasatuss Oral
+Propatuss Expectorant
+Sudatuss SF
+Statuss Green
+Duratuss H
 morphabond
 kadian
 sufentanil
@@ -398,3 +426,8 @@ carfentanil
 pethidine
 dihydrocodeine
 dhc continus
+???zoltex
+zotex-HC
+zotex HC
+zotex-C
+zotex C
