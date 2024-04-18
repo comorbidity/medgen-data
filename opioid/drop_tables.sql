@@ -1,5 +1,18 @@
 -- Curated tables
 drop table if exists curated;
+drop table if exists curated_VSAC_Mathematica;
+drop table if exists curated_bioportal;
+drop table if exists curated_bioportal_to_umls;
+
+-- Exapnd tables
+drop table if exists expand_VSAC_Mathematica;
+drop table if exists expand_bioportal;
+drop table if exists expand_bioportal_to_umls;
+
+-- Keywords
+drop table if exists keywords, keywords_orig;
+
+-- RXNORM selections
 drop table if exists RXNSTY_curated;
 drop table if exists RXNREL_curated;
 drop table if exists RXNCONSO_curated;
@@ -25,12 +38,17 @@ drop table if exists umls_rela;
 drop table if exists umls_tty;
 drop table if exists umls_tui;
 
--- Statistics 
+-- Statistics
+drop table if exists stats_keywords;
+drop table if exists stats_expand;
+
 drop table if exists stats_tty;
 drop table if exists stats_rel;
 drop table if exists stats_rela;
 drop table if exists stats_tui; 
 drop table if exists stats_sab;
+
+
 
 
 
