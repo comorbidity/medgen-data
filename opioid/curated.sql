@@ -1,4 +1,35 @@
-call log('curated', 'begin');
+-- ##############################################
+call log('keyword', 'create table.');
+
+drop table if exists keywords, keywords_orig;
+create table keywords
+(
+ STR   VARCHAR(50) 	NOT NULL
+);
+
+call log('infile', 'keywords.tsv');
+
+load data local infile 'keywords.tsv'
+into table keywords
+fields terminated by '\t'
+optionally enclosed by '"'
+ESCAPED BY ''
+lines terminated by '\n'
+ignore 1 lines;
+
+show warnings;
+
+rename table keywords to keywords_orig;
+create table keywords
+    select
+        distinct trim(STR) as STR,
+        length(trim(STR)) as LEN
+    from keywords_orig
+    order by trim(STR);
+
+call create_index('keywords','STR');
+call create_index('keywords','LEN');
+
 -- ##############################################
 call log('curated', 'create table.'); 
 
@@ -22,7 +53,6 @@ ignore 1 lines;
 show warnings; 
 
 call create_index('curated','RXCUI');
-call create_index('curated','STR(255)'); 
 
 -- ##############################################
 call log('RXNSTY_curated', 'refresh'); 
@@ -33,7 +63,6 @@ create table RXNSTY_curated
 select distinct S.* from rxnorm.RXNSTY as S, curated where S.RXCUI = curated.RXCUI;
 
 call create_index('RXNSTY_curated','RXCUI');
-call create_index('RXNSTY_curated','TUI'); 
 
 -- ##############################################
 call log('RXNREL_curated', 'refresh'); 
@@ -46,8 +75,6 @@ where R.RXCUI1 = curated.RXCUI;
 
 call create_index('RXNREL_curated','RXCUI1');
 call create_index('RXNREL_curated','RXCUI2');
-call create_index('RXNREL_curated','REL');
-call create_index('RXNREL_curated','RELA');
 
 -- ##############################################
 call log('RXNCONSO_curated', 'refresh'); 
@@ -55,10 +82,32 @@ call log('RXNCONSO_curated', 'refresh');
 drop table if exists RXNCONSO_curated;
 
 create table RXNCONSO_curated
-select distinct C.* from rxnorm.RXNCONSO as C, curated 
+select distinct C.* from rxnorm.RXNCONSO as C, curated
 where C.RXCUI = curated.RXCUI;
 
+alter table RXNCONSO_curated add column keyword_min varchar(30) NULL;
+alter table RXNCONSO_curated add column keyword_max varchar(30) NULL;
+alter table RXNCONSO_curated add column keyword_min_len int NULL;
+alter table RXNCONSO_curated add column keyword_max_len int NULL;
+
+call create_index('RXNCONSO_curated','STR(255)');
 call create_index('RXNCONSO_curated','RXCUI');
+
+update RXNCONSO_curated C, keywords K
+set
+    C.keyword_min = K.STR,
+    C.keyword_min_len = K.LEN
+where C.STR like concat('%',K.STR, '%')
+order by K.len ASC
+;
+
+update RXNCONSO_curated C, keywords K
+set
+    C.keyword_max = K.STR,
+    C.keyword_max_len = K.LEN
+where C.STR like concat('%',K.STR, '%')
+order by K.len DESC
+;
 
 -- ##############################################
 call log('RXNCONSO_curated_rela', 'refresh'); 
@@ -75,7 +124,7 @@ call create_index('RXNCONSO_curated_rela','RXCUI1');
 call create_index('RXNCONSO_curated_rela','RXCUI2');
 call create_index('RXNCONSO_curated_rela','TTY');
 call create_index('RXNCONSO_curated_rela','REL');
-call create_index('RXNCONSO_curated_rela','RELA'); 
+call create_index('RXNCONSO_curated_rela','RELA');
 
 -- ##############################################
 call log('expand', 'refresh'); 
@@ -89,9 +138,9 @@ where RXCUI=RXCUI2 and RXCUI2 not in (select distinct RXCUI from RXNCONSO_curate
 call create_index('expand','RXCUI');
 call create_index('expand','RXCUI1');
 call create_index('expand','RXCUI2'); 
-call create_index('expand','REL');
-call create_index('expand','RELA');
-call create_index('expand','TTY'); 
+-- call create_index('expand','REL');
+-- call create_index('expand','RELA');
+-- call create_index('expand','TTY');
 
 -- ##############################################
 call log('expand_cui', 'refresh'); 
@@ -119,7 +168,6 @@ create table expand_cui_rela_str
 select distinct RXCUI,RELA,STR from expand order by RXCUI, RELA, STR ;
 
 call create_index('expand_cui_rela_str','RXCUI');
-call create_index('expand_cui_rela_str','RELA');
 
 -- ##############################################
 call log('expand_cui_rela_cui', 'refresh'); 
@@ -129,7 +177,6 @@ create table expand_cui_rela_cui
 select distinct RXCUI,RXCUI1,RELA,RXCUI2 from expand order by RXCUI,RXCUI1,RELA,RXCUI2 ;
 
 call create_index('expand_cui_rela_cui','RXCUI');
-call create_index('expand_cui_rela_cui','RELA');
 
 -- ##############################################
 call log('expand_tradename', 'refresh'); 
@@ -194,9 +241,5 @@ select distinct RXCUI,RELA, STR from expand where RELA in ('form_of', 'has_form'
 
 call create_index('expand_form ','RXCUI');
 
-
 -- ##############################################
 call log('curated', 'done.');
-
-
-

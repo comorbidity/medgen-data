@@ -1,4 +1,6 @@
 -- ##############################################
+call log('create_tables.sql', 'begin');
+
 call log('umls_tui', 'UMLS Semantic Type');
 call log('umls_tui', 'https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt'); 
 
@@ -75,3 +77,6 @@ ignore 1 lines;
 show warnings; 
 
 call create_index('umls_rela','RELA');
+
+-- ##############################################
+call log('create_tables.sql', 'done');

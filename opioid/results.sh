@@ -3,7 +3,7 @@
 source db.config
 
 echo "start clean"
-$mysql_dataset -e "call log('refresh', 'begin')"
+$mysql_dataset -e "call log('results.sh', 'begin')"
 
 $mysql_dataset < drop_tables.sql
 $mysql_dataset < create_tables.sql
@@ -21,7 +21,7 @@ if [ -z "$CURATED" ]; then
 fi
 
 echo "Using $CURATED.tsv"
-$mysql_dataset -e "call log('$CURATED', ''${CURATED}'')"
+$mysql_dataset -e "call log('CURATED', '${CURATED}')"
 $mysql_dataset -e "call log('${CURATED}', 'begin')"
 
 rm -f curated.tsv
@@ -32,6 +32,7 @@ $mysql_dataset < stats.sql
 
 pushd .
 cd ..
+./backup_curated.sh opioid RXNCONSO_curated
 ./backup_curated.sh opioid curated
 ./backup_curated.sh opioid expand
 
@@ -46,3 +47,4 @@ cd ..
 cd opioid
 
 $mysql_dataset -e "call log('${CURATED}', 'done')"
+$mysql_dataset -e "call log('results.sh', 'done')"

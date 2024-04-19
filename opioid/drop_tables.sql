@@ -1,3 +1,6 @@
+-- ##############################################
+call log('drop_tables.sql', 'begin');
+
 -- Curated tables
 drop table if exists curated;
 drop table if exists curated_VSAC_Mathematica;
@@ -48,6 +51,8 @@ drop table if exists stats_rela;
 drop table if exists stats_tui; 
 drop table if exists stats_sab;
 
+-- ##############################################
+call log('drop_tables.sql', 'done');
 
 
 

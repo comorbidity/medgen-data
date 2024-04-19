@@ -2,8 +2,10 @@
 
 source db.config
 
-#export CURATED="all_rxcui_str"
-#./results.sh
+$mysql_dataset -e "call log('results_all.sh', 'begin')"
+
+export CURATED="all_rxcui_str"
+./results.sh
 
 export CURATED="VSAC_Mathematica"
 ./results.sh
@@ -17,7 +19,9 @@ export CURATED="bioportal_to_umls"
 #export CURATED="umls_reviewed_march26"
 #./results.sh
 
-#export CURATED="umls_reviewed_april7"
-#./results.sh
+export CURATED="umls_reviewed_april7"
+./results.sh
+
+$mysql_dataset -e "call log('results_all.sh', 'done')"
 
 ############################################################
