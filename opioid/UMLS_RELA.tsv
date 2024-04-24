@@ -1,4 +1,4 @@
-RELA  (Relationship Attribute)	RELA Description
+#RELA  (Relationship Attribute) RELA Description
 abnormal_cell_affected_by_chemical_or_drug	abnormal cell affected by chemical or drug
 abnormality_associated_with_allele	abnormality associated with allele
 absorbability_of	Absorbability of
@@ -1022,5 +1022,3 @@ venous_drainage_of	Venous drainage of
 version_of	Version of
 was_a	Was a
 wound_has_communication_with	Wound has communication with
-	Empty relationship attribute
-	

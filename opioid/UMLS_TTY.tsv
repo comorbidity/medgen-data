@@ -1,4 +1,4 @@
-Term Type in Source	TTY Description
+#Term Type in Source	TTY Description
 AA	Attribute type abbreviation
 AB	Abbreviation in any source vocabulary
 ACR	Acronym
@@ -26,7 +26,7 @@ CHN	Chemical structure name
 CL	Class
 CMN	Common name
 CN	LOINC official component name
-CO	Component name (these are hierarchical terms, as opposed to the LOINC component names which are analytes)
+CO	Component name (hierarchical terms, not LOINC analytes)
 CPR	Concept property
 CP	ICPC component process (in original form)
 CR	Concept relationship
@@ -159,8 +159,8 @@ OOSN	Obsolete official short name
 OPN	Obsolete preferred term, natural language form
 OP	Obsolete preferred name
 OR	Orders
-OSJKN1	Japanese System-organ class in the WHO Adverse Reaction Terminology (kana1)
-OSJKN	Japanese System-organ class in the WHO Adverse Reaction Terminology (kana)
+OSJKN1	Japanese System-organ class WHO Adverse Reaction Terminology (kana1)
+OSJKN	Japanese System-organ class WHO Adverse Reaction Terminology (kana)
 OSN	Official short name
 OS	System-organ class
 PCE	Preferred entry term for Supplementary Concept
@@ -194,20 +194,20 @@ RHT	Root hierarchical term
 RPT	Root preferred term
 RSY	Root synonym
 RS	Extracted related names in SNOMED2
-RT	Term that is related to, but often considered non-synonymous with, the preferred term
+RT	Term is related to, but often non-synonymous with, the preferred term
 RXN_IN	Rxnorm Preferred Ingredient
 RXN_PT	Rxnorm Preferred
 SBDC	Semantic Branded Drug Component
-SBDFP	Semantic branded drug and form with precise ingredient as basis of strength
+SBDFP	Semantic branded drug and form w/ precise ingredient as basis strength
 SBDF	Semantic branded drug and form
 SBDG	Semantic branded drug group
 SBD	Semantic branded drug
 SB	Named subset of a source
 SCALE	Scale
 SCDC	Semantic Drug Component
-SCDFP	Semantic clinical drug and form with precise ingredient as basis of strength
+SCDFP	Semantic clinical drug and form w/ precise ingredient as basis strength
 SCDF	Semantic clinical drug and form
-SCDGP	Semantic clinical drug group with precise ingredient as basis of strength
+SCDGP	Semantic clinical drug group w/ precise ingredient as basis strength
 SCDG	Semantic clinical drug group
 SCD	Semantic Clinical Drug
 SCN	Scientific name
