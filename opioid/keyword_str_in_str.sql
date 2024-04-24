@@ -22,7 +22,7 @@ call log('keywords_str_in_str.sql', 'brovex');
     and   lower(STR) not like concat('%','brovex-dc','%')
     and   lower(STR) not like concat('%','brovex-hc','%')
     and   lower(STR) not like concat('%','brovex-pb','%')
-    order by STR, length(STR)
+    order by STR, length(STR);
 
 -- ##############################################
 call log('keywords_str_in_str.sql', 'co-tuss');
