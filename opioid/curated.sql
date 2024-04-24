@@ -47,7 +47,7 @@ into table curated
 fields terminated by '\t'
 optionally enclosed by '"' 
 ESCAPED BY '' 
-lines terminated by '\n' 
+lines terminated by '\n'
 ignore 1 lines;
 
 show warnings; 

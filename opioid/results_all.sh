@@ -4,6 +4,9 @@ source db.config
 
 $mysql_dataset -e "call log('results_all.sh', 'begin')"
 
+export CURATED="opium_rxcui_str"
+./results.sh
+
 export CURATED="all_rxcui_str"
 ./results.sh
 

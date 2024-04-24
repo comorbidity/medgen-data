@@ -2,15 +2,21 @@
 call log('drop_tables.sql', 'begin');
 
 -- Curated tables
-drop table if exists curated;
-drop table if exists curated_VSAC_Mathematica;
-drop table if exists curated_bioportal;
-drop table if exists curated_bioportal_to_umls;
+drop table if exists curated,
+curated_all_rxcui_str,          RXNCONSO_curated_all_rxcui_str,
+curated_VSAC_Mathematica,       RXNCONSO_curated_VSAC_Mathematica,
+curated_bioportal,              RXNCONSO_curated_bioportal,
+curated_bioportal_to_umls,      RXNCONSO_curated_bioportal_to_umls,
+curated_umls_reviewed_april7,   RXNCONSO_curated_umls_reviewed_april7,
+RXNCONSO_curated_jaccard;
 
 -- Exapnd tables
-drop table if exists expand_VSAC_Mathematica;
-drop table if exists expand_bioportal;
-drop table if exists expand_bioportal_to_umls;
+drop table if exists expand,
+expand_all_rxcui_str,
+expand_VSAC_Mathematica,
+expand_bioportal,
+expand_bioportal_to_umls,
+expand_umls_reviewed_april7;
 
 -- Keywords
 drop table if exists keywords, keywords_orig;
