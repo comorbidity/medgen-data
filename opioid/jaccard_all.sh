@@ -4,7 +4,7 @@ $mysql_dataset -e "call log('jaccard_all.sh', 'https://en.wikipedia.org/wiki/Jac
 $mysql_dataset -e "call log('jaccard_all.sh', 'begin')"
 
 ################################################################################
-export CURATED="opium_rxcui_str"
+export CURATED="custom_rxcui_str"
 source jaccard.sh
 
 ###############################################################################
@@ -24,7 +24,7 @@ export CURATED="bioportal_to_umls"
 source jaccard.sh
 
 ################################################################################
-export CURATED="umls_reviewed_april7"
+export CURATED="wasz_april7"
 source jaccard.sh
 
 ################################################################################

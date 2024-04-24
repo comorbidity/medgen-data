@@ -1,5 +1,5 @@
 -- ##############################################
-call log('create_tables.sql', 'begin');
+call log('umls_meta.sql', 'begin');
 
 call log('umls_tui', 'UMLS Semantic Type');
 call log('umls_tui', 'https://lhncbc.nlm.nih.gov/ii/tools/MetaMap/Docs/SemanticTypes_2018AB.txt'); 
@@ -16,7 +16,6 @@ load data local infile 'UMLS_TUI.tsv' into table umls_tui;
 show warnings; 
 
 call create_index('umls_tui','TUI');
-
 
 -- ##############################################
 call log('umls_tty', 'Term Type in source'); 
@@ -79,4 +78,4 @@ show warnings;
 call create_index('umls_rela','RELA');
 
 -- ##############################################
-call log('create_tables.sql', 'done');
+call log('umls_meta.sql', 'done');

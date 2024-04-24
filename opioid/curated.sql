@@ -1,104 +1,74 @@
 -- ##############################################
-call log('keyword', 'create table.');
-
-drop table if exists keywords, keywords_orig;
-create table keywords
-(
- STR   VARCHAR(50) 	NOT NULL
-);
-
-call log('infile', 'keywords.tsv');
-
-load data local infile 'keywords.tsv'
-into table keywords
-fields terminated by '\t'
-optionally enclosed by '"'
-ESCAPED BY ''
-lines terminated by '\n'
-ignore 1 lines;
-
-show warnings;
-
-rename table keywords to keywords_orig;
-create table keywords
-    select
-        distinct trim(STR) as STR,
-        length(trim(STR)) as LEN
-    from keywords_orig
-    order by trim(STR);
-
-call create_index('keywords','STR');
-call create_index('keywords','LEN');
-
--- ##############################################
-call log('curated', 'create table.'); 
+call log('curated', 'create table');
 
 drop table if exists curated;
 create table curated
 (
- RXCUI varchar(8)	NOT NULL,
- STR   TEXT 	NULL
+ RXCUI varchar(8)	    NOT NULL,
+ STR   varchar(3000)    NOT NULL
 );
 
 call log('infile', 'curated.tsv');
 
-load data local infile 'curated.tsv' 
-into table curated
-fields terminated by '\t'
-optionally enclosed by '"' 
-ESCAPED BY '' 
-lines terminated by '\n'
-ignore 1 lines;
+load    data local infile 'curated.tsv'
+into    table keywords
+        fields      terminated by '\t'
+        optionally  enclosed by '"' ESCAPED BY ''
+        lines       terminated by '\n'
+        ignore 1 lines;
 
 show warnings; 
 
 call create_index('curated','RXCUI');
+call create_index('curated','STR(');
 
 -- ##############################################
-call log('RXNSTY_curated', 'refresh'); 
+call log('curated_keywords', 'refresh');
 
-drop table if exists RXNSTY_curated;
+drop table if exists curated_keywords;
 
-create table RXNSTY_curated
-select distinct S.* from rxnorm.RXNSTY as S, curated where S.RXCUI = curated.RXCUI;
-
-call create_index('RXNSTY_curated','RXCUI');
-
--- ##############################################
-call log('RXNREL_curated', 'refresh'); 
-
-drop table if exists RXNREL_curated;
-
-create table RXNREL_curated
-select distinct R.* from rxnorm.RXNREL as R, curated 
-where R.RXCUI1 = curated.RXCUI; 
-
-call create_index('RXNREL_curated','RXCUI1');
-call create_index('RXNREL_curated','RXCUI2');
+create table curated_keywords
+select distinct
+    C.RXCUI,
+    C.STR,
+    K.STR as keyword_str,
+    K.LEN as keyword_len
+from curated C, keywords K
+where C.STR like concat('%',K.STR, '%')
+order by K.STR, K.LEN;
 
 -- ##############################################
 call log('RXNCONSO_curated', 'refresh'); 
 
 drop table if exists RXNCONSO_curated;
 
-create table RXNCONSO_curated
-select distinct C.* from rxnorm.RXNCONSO as C, curated
-where C.RXCUI = curated.RXCUI;
+CREATE TABLE RXNCONSO_curated
+(
+    RXCUI   varchar(8)  NOT NULL,
+    STR     varchar(3000)   NOT NULL,
+    TTY     varchar(20) NOT NULL,
+    SAB     varchar(20) NOT NULL,
+    keyword_bool tinyint(1) default 0,
+    keyword_min     varchar(30) NULL,
+    keyword_min_len int NULL,
+    keyword_max     varchar(30) NULL,
+    keyword_max_len int NULL
+);
 
-alter table RXNCONSO_curated add column keyword_min varchar(30) NULL;
-alter table RXNCONSO_curated add column keyword_max varchar(30) NULL;
-alter table RXNCONSO_curated add column keyword_min_len int NULL;
-alter table RXNCONSO_curated add column keyword_max_len int NULL;
-
-call create_index('RXNCONSO_curated','STR(255)');
-call create_index('RXNCONSO_curated','RXCUI');
+insert into RXNCONSO_curated
+    (RXCUI, STR, TTY, SAB)
+select distinct
+    C.RXCUI, C.STR, C.TTY, C.SAB
+from rxnorm.RXNCONSO as C, curated
+where C.RXCUI = curated.RXCUI
+;
 
 update RXNCONSO_curated C, keywords K
 set
     C.keyword_min = K.STR,
     C.keyword_min_len = K.LEN
 where C.STR like concat('%',K.STR, '%')
-order by K.len ASC
+order by K.LEN ASC
 ;
 
 update RXNCONSO_curated C, keywords K
@@ -108,6 +78,31 @@ set
 where C.STR like concat('%',K.STR, '%')
 order by K.len DESC
 ;
+
+call create_index('RXNCONSO_curated','STR(255)');
+call create_index('RXNCONSO_curated','RXCUI');
+
+-- ##############################################
+call log('RXNSTY_curated', 'refresh');
+
+drop table if exists RXNSTY_curated;
+
+create table RXNSTY_curated
+select distinct S.* from rxnorm.RXNSTY as S, curated where S.RXCUI = curated.RXCUI;
+
+call create_index('RXNSTY_curated','RXCUI');
+
+-- ##############################################
+call log('RXNREL_curated', 'refresh');
+
+drop table if exists RXNREL_curated;
+
+create table RXNREL_curated
+select distinct R.* from rxnorm.RXNREL as R, curated
+where R.RXCUI1 = curated.RXCUI;
+
+call create_index('RXNREL_curated','RXCUI1');
+call create_index('RXNREL_curated','RXCUI2');
 
 -- ##############################################
 call log('RXNCONSO_curated_rela', 'refresh'); 

@@ -17,9 +17,12 @@ insert into RXNCONSO_curated_jaccard
 select *, 'bioportal_to_umls' as curated from  RXNCONSO_curated_bioportal_to_umls;
 
 insert into RXNCONSO_curated_jaccard
-select *, 'umls_reviewed_april7' as curated from  RXNCONSO_curated_umls_reviewed_april7;
+select *, 'wasz_april7' as curated from  RXNCONSO_curated_wasz_april7;
 
 insert into RXNCONSO_curated_jaccard
-select *, 'opium_rxcui_str' as curated from  RXNCONSO_curated_opium_rxcui_str;
+select *, 'custom_rxcui_str' as curated from  RXNCONSO_curated_custom_rxcui_str;
+
+call log('jaccard_all.sql', 'show summary');
+select curated, count(distinct RXCUI) cnt from RXNCONSO_curated_jaccard group by curated order by cnt desc;
 
 call log('jaccard_all.sql', 'done');

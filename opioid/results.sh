@@ -8,6 +8,7 @@ $mysql_dataset -e "call log('results.sh', 'begin')"
 $mysql_dataset < drop_tables.sql
 $mysql_dataset < create_tables.sql
 
+# export CURATED="custom_rxcui_str"
 # export CURATED="all_rxcui_str"
 # export CURATED="VSAC_Mathematica"
 # export CURATED="bioportal"

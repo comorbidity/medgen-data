@@ -4,7 +4,7 @@ source db.config
 
 $mysql_dataset -e "call log('results_all.sh', 'begin')"
 
-export CURATED="opium_rxcui_str"
+export CURATED="custom_rxcui_str"
 ./results.sh
 
 export CURATED="all_rxcui_str"
@@ -19,10 +19,7 @@ export CURATED="bioportal"
 export CURATED="bioportal_to_umls"
 ./results.sh
 
-#export CURATED="umls_reviewed_march26"
-#./results.sh
-
-export CURATED="umls_reviewed_april7"
+export CURATED="wasz_april7"
 ./results.sh
 
 $mysql_dataset -e "call log('results_all.sh', 'done')"

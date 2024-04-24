@@ -1,4 +1,7 @@
 -- ##############################################
+call log('stats.sql', 'begin');
+
+-- ##############################################
 drop table if exists stats_sab; -- RXNORM vocab summary
 
 create table stats_sab as
@@ -40,4 +43,5 @@ drop table if exists stats_rela; -- REL Attributes
 create table stats_rela as 
 select C.RELA, count(distinct RXCUI) as cnt from RXNCONSO_curated_rela C, umls_rel U where C.rel=U.rel group by C.RELA order by cnt desc;
 
-
+-- ##############################################
+call log('stats.sql', 'done');
