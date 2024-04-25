@@ -1,4 +1,5 @@
 #!/bin/bash
+source db.config
 
 set -e
 
@@ -15,24 +16,24 @@ if [ "$#" -lt 1 ]; then
     exit 1
 else
     export TSV_FILENAME="$CURATED.$DB_TABLE.tsv"
-    export TSV_FILEPATH="/Users/andy/umls/opioid/tsv/$TSV_FILENAME"
+    export TSV_FILEPATH="/Users/andy/code/medgen-umls/opioid/tsv/$TSV_FILENAME"
 fi
+
+export mysql_table_schema="mysql  --auto-rehash -D $CURATED -u $DB_USER -p$DB_PASS -h $DB_HOST --port $DB_PORT --local-infile --auto-rehash"
 
 echo '##########################'
 echo " CURATED  = $CURATED"
 echo " DB_TABLE = $DB_TABLE"
 echo " TSV_FILENAME  = $TSV_FILENAME "
 echo " TSV_FILEPATH  = $TSV_FILEPATH "
+echo  "$mysql_table_schema"
 echo '##########################'
 
 rm -f $TSV_FILEPATH
+mkdir -p tsv
+# mysql -u root -e "SHOW VARIABLES LIKE 'secure_file_priv'"
+mysql -u root -e 'SET GLOBAL local_infile=1'
 
-$mysql_table_schema -e "call log('export_tsv.sh', 'begin')"
-
-$mysql_table_schema -e 'SET GLOBAL local_infile=1'
-
-$mysql_table_schema -e "select * into outfile '$TSV_FILEPATH' FIELDS TERMINATED BY '\t' from $DB_TABLE"
-
-$mysql_table_schema -e "call log('export_tsv.sh', 'done')"
+$mysql_table_schema -e "select * into outfile '$TSV_FILEPATH' FIELDS TERMINATED BY '\t' from $CURATED.$DB_TABLE"
 
 echo '##########################'

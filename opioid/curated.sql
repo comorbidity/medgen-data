@@ -101,12 +101,20 @@ call log('RXNCONSO_curated_rela', 'refresh');
 drop table if exists RXNCONSO_curated_rela;
 
 create table RXNCONSO_curated_rela
-select distinct C.*, R.RXCUI1, R.RXCUI2, R.REL, R.RELA
+select distinct
+        C.RXCUI,
+        C.STR,
+        C.TTY,
+        C.SAB,
+        C.RXAUI,
+        C.SAUI,
+        R.RXCUI2,
+        R.REL,
+        R.RELA
 from rxnorm.RXNCONSO as C, RXNREL_curated as R
-where (C.RXCUI = R.RXCUI1) or (C.RXCUI = R.RXCUI2);
+where R.RXCUI1 = C.RXCUI;
 
 call create_index('RXNCONSO_curated_rela','RXCUI');
-call create_index('RXNCONSO_curated_rela','RXCUI1'); 
 call create_index('RXNCONSO_curated_rela','RXCUI2');
 call create_index('RXNCONSO_curated_rela','TTY');
 call create_index('RXNCONSO_curated_rela','REL');
