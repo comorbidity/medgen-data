@@ -32,10 +32,10 @@ $mysql_dataset < stats.sql
 
 ./backup_curated.sh
 
-#./backup_curated.sh curated
-#./backup_curated.sh RXNCONSO_curated
+#./backup_database.sh curated
+#./backup_database.sh RXNCONSO_curated
 #
-#./backup_curated.sh expand
+#./backup_database.sh expand
 #
 #./export_tsv.sh stats_expand
 #./export_tsv.sh stats_keywords
@@ -46,7 +46,5 @@ $mysql_dataset < stats.sql
 #./export_tsv.sh stats_rela
 
 $mysql_dataset -e "call version('${CURATED}', 'results.sh:done')"
-
-cd opioid
-
 $mysql_dataset -e "call log('results.sh', 'done')"
+$mysql_dataset -e "call mem"

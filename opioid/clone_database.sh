@@ -1,22 +1,23 @@
 #!/bin/bash
 set -e
 source db.config
+source env_table_schema.sh
 
-if [ "$#" -lt 1 ]; then
-  TABLE_SCHEMA=$CURATED
-  echo "no TABLE_SCHEMA name was provided, trying CURATED *** [${CURATED}] ***"
-else
-    TABLE_SCHEMA=$1
-fi
-
-if [ -z "$TABLE_SCHEMA" ]; then
-  TABLE_SCHEMA=$DATASET
-  echo "CURATED was not set, using default db.config *** [${DATASET}] ***"
-fi
-
-if [ -z "$TABLE_SCHEMA" ]; then
-  echo "no TABLE_SCHEMA name was found, abort."
-fi
+#if [ "$#" -lt 1 ]; then
+#  TABLE_SCHEMA=$CURATED
+#  echo "no TABLE_SCHEMA name was provided, trying CURATED *** [${CURATED}] ***"
+#else
+#    TABLE_SCHEMA=$1
+#fi
+#
+#if [ -z "$TABLE_SCHEMA" ]; then
+#  TABLE_SCHEMA=$DATASET
+#  echo "CURATED was not set, using default db.config *** [${DATASET}] ***"
+#fi
+#
+#if [ -z "$TABLE_SCHEMA" ]; then
+#  echo "no TABLE_SCHEMA name was found, abort."
+#fi
 
 DUMP_FILE="mysqldump/$TABLE_SCHEMA.mysqldump"
 
@@ -32,4 +33,6 @@ mysql_table_schema="mysql  --auto-rehash -D $TABLE_SCHEMA -u $DB_USER -p$DB_PASS
 $mysql_table_schema < $DUMP_FILE
 
 $mysql_table_schema -e "call mem"
+
+$mysql_table_schema -e "show databases"
 echo '##########################'
