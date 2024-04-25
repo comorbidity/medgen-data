@@ -52,9 +52,9 @@ group by U.TUI,U.TUI_STR
 order by cnt_rxcui desc;
 
 -- ############################################## (expand)
--- RXCUI1:RXCUI2
-drop    table if exists stats_expand_cui1_cui2;
-create  table           stats_expand_cui1_cui2 as
+--
+drop    table if exists stats_expand;
+create  table           stats_expand as
 select  count(*)                as cnt_star,
         count(distinct RXCUI)   as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2

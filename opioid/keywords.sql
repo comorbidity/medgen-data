@@ -1,18 +1,23 @@
 -- #############################################################################
-call log('keywords', 'create table.');
+call log('keywords.sql', 'begin');
 
-drop table if exists keywords, keywords_orig, keywords_str_in_str;
+-- #############################################################################
+call log('keywords', 'create table');
+
+drop table if exists keywords, keywords_orig, keywords_str_in_str, keywords_delete;
 
 create table keywords(
  STR   VARCHAR(50) 	NOT NULL
 );
 
-call    log('infile', 'keywords.tsv');
-load    data local infile 'keywords.tsv'
-into    table keywords
-        fields      terminated by '\t'
-        optionally  enclosed by '"' ESCAPED BY ''
-        lines       terminated by '\n'
+call log('keywords.tsv', 'infile');
+
+load    data
+local   infile          'keywords.tsv'
+into    table            keywords
+        fields           terminated by '\t'
+        optionally       enclosed by '"' ESCAPED BY ''
+        lines            terminated by '\n'
         ignore 1 lines;
 
 show warnings;
@@ -20,13 +25,12 @@ show warnings;
 -- #############################################################################
 call log('keywords', 'keywords_orig');
 
-rename table keywords to keywords_orig;
-create table keywords
-        select
-            distinct trim(STR) as STR,
-            length(trim(STR)) as LEN
-        from keywords_orig
-        order by trim(STR);
+rename  table keywords to keywords_orig;
+create  table keywords
+select  distinct trim(STR)  as STR,
+        length(trim(STR))   as LEN
+from    keywords_orig
+order by trim(STR);
 
 call create_index('keywords','STR');
 call create_index('keywords','LEN');
@@ -48,9 +52,15 @@ order by
     length(K2.STR) asc;
 
 -- #############################################################################
-call log('keywords', 'deleting longer pattern');
-select STR1, STR2 from keywords_str_in_str;
+call log('keywords_delete', 'deleting longer pattern');
+
+drop    table if exists keywords_delete;
+create  table           keywords_delete
+select  distinct STR1, STR2
+from    keywords_str_in_str
+order by  STR1, STR2;
 
 delete from keywords where STR in (select STR1 from keywords_str_in_str);
 
-
+-- #############################################################################
+call log('keywords.sql', 'done');
