@@ -13,14 +13,14 @@ source db.config
 ####################################################
 
 if [ "$#" -lt 1 ]; then
-  TABLE_SCHEMA=$CURATED
+  export TABLE_SCHEMA=$CURATED
   echo "no TABLE_SCHEMA name was provided, trying CURATED *** [${CURATED}] ***"
 else
-    TABLE_SCHEMA=$1
+    export TABLE_SCHEMA=$1
 fi
 
 if [ -z "$TABLE_SCHEMA" ]; then
-  TABLE_SCHEMA=$DATASET
+  export TABLE_SCHEMA=$DATASET
   echo "CURATED was not set, using default db.config *** [${DATASET}] ***"
 fi
 
@@ -28,7 +28,7 @@ if [ -z "$TABLE_SCHEMA" ]; then
   echo "no TABLE_SCHEMA name was found, abort."
 fi
 
-mysql_table_schema="mysql  --auto-rehash -D $TABLE_SCHEMA -u $DB_USER -p$DB_PASS -h $DB_HOST --port $DB_PORT --local-infile --auto-rehash"
+export mysql_table_schema="mysql  --auto-rehash -D $TABLE_SCHEMA -u $DB_USER -p$DB_PASS -h $DB_HOST --port $DB_PORT --local-infile --auto-rehash"
 
 echo '##########################'
 echo " DATASET  = $DATASET"

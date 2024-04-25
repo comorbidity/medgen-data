@@ -1,5 +1,19 @@
 -- ##############################################
-call log('drop_curated.sql', 'begin');
+call log('drop_tables.sql', 'begin');
+
+-- version
+    drop table if exists    version;
+
+-- keywords
+    drop table if exists    keywords,
+                            keywords_orig,
+                            keywords_str_in_str;
+
+-- UMLS abbreviations
+    drop table if exists umls_rel;
+    drop table if exists umls_rela;
+    drop table if exists umls_tty;
+    drop table if exists umls_tui;
 
 -- curated
 drop table if exists    curated,
@@ -57,7 +71,7 @@ drop table if exists    stats_keywords,
                         stats_sab;
 
 -- ##############################################
-call log('drop_curated.sql', 'done');
+call log('drop_tables.sql', 'done');
 
 
 

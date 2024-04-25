@@ -4,15 +4,13 @@ source db.config
 source env_table_schema.sh
 
 $mysql_table_schema -e "call log('results.sh', 'begin')"
-$mysql_table_schema < drop_curated.sql
 
 # export CURATED="custom_rxcui_str"
 # export CURATED="all_rxcui_str"
 # export CURATED="vsac_math"
 # export CURATED="bioportal"
 # export CURATED="bioportal_to_umls"
-# export CURATED="umls_reviewed_march26"
-# export CURATED="curated_from_expanded_april7"
+# export CURATED="wasz_april7"
 
 if [ -z "$CURATED" ]; then
   echo "CURATED is not set. Exiting..."
