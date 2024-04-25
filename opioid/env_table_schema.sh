@@ -2,6 +2,16 @@
 set -e
 source db.config
 
+####################################################
+# CURATED:
+# export CURATED="custom_rxcui_str"
+# export CURATED="all_rxcui_str"
+# export CURATED="vsac_math"
+# export CURATED="bioportal"
+# export CURATED="bioportal_to_umls"
+# export CURATED="wasz_april7"
+####################################################
+
 if [ "$#" -lt 1 ]; then
   TABLE_SCHEMA=$CURATED
   echo "no TABLE_SCHEMA name was provided, trying CURATED *** [${CURATED}] ***"

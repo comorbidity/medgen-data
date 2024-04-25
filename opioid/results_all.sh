@@ -3,11 +3,11 @@
 source db.config
 
 ################################################################################
-$mysql_dataset < umls_abbreviations.sql
-$mysql_dataset < keywords.sql
-$mysql_dataset < version.sql
+$mysql_table_schema < umls_abbreviations.sql
+$mysql_table_schema < keywords.sql
+$mysql_table_schema < version.sql
 
-$mysql_dataset -e "call log('results_all.sh', 'begin')"
+$mysql_table_schema -e "call log('results_all.sh', 'begin')"
 
 export CURATED="custom_rxcui_str"
 ./results.sh
@@ -15,7 +15,7 @@ export CURATED="custom_rxcui_str"
 export CURATED="all_rxcui_str"
 ./results.sh
 
-export CURATED="VSAC_Mathematica"
+export CURATED="vsac_math"
 ./results.sh
 
 export CURATED="bioportal"
@@ -27,6 +27,6 @@ export CURATED="bioportal_to_umls"
 export CURATED="wasz_april7"
 ./results.sh
 
-$mysql_dataset -e "call log('results_all.sh', 'done')"
+$mysql_table_schema -e "call log('results_all.sh', 'done')"
 
 ################################################################################

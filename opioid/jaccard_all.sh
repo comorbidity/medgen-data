@@ -1,7 +1,7 @@
 source db.config
 
-$mysql_dataset -e "call log('jaccard_all.sh', 'https://en.wikipedia.org/wiki/Jaccard_index')"
-$mysql_dataset -e "call log('jaccard_all.sh', 'begin')"
+$mysql_table_schema -e "call log('jaccard_all.sh', 'https://en.wikipedia.org/wiki/Jaccard_index')"
+$mysql_table_schema -e "call log('jaccard_all.sh', 'begin')"
 
 ################################################################################
 export CURATED="custom_rxcui_str"
@@ -12,7 +12,7 @@ export CURATED="all_rxcui_str"
 source jaccard.sh
 
 ###############################################################################
-export CURATED="VSAC_Mathematica"
+export CURATED="vsac_math"
 source jaccard.sh
 
 ###############################################################################
@@ -28,9 +28,9 @@ export CURATED="wasz_april7"
 source jaccard.sh
 
 ################################################################################
-$mysql_dataset < jaccard_all.sql
+$mysql_table_schema < jaccard_all.sql
 
-$mysql_dataset -e "call log('jaccard_all.sh', 'done')"
+$mysql_table_schema -e "call log('jaccard_all.sh', 'done')"
 
 
 

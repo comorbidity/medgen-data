@@ -27,12 +27,12 @@ echo '##########################'
 
 rm -f $TSV_FILEPATH
 
-$mysql_dataset -e "call log('export_tsv.sh', 'begin')"
+$mysql_table_schema -e "call log('export_tsv.sh', 'begin')"
 
-$mysql_dataset -e 'SET GLOBAL local_infile=1'
+$mysql_table_schema -e 'SET GLOBAL local_infile=1'
 
-$mysql_dataset -e "select * into outfile '$TSV_FILEPATH' FIELDS TERMINATED BY '\t' from $DB_TABLE"
+$mysql_table_schema -e "select * into outfile '$TSV_FILEPATH' FIELDS TERMINATED BY '\t' from $DB_TABLE"
 
-$mysql_dataset -e "call log('export_tsv.sh', 'done')"
+$mysql_table_schema -e "call log('export_tsv.sh', 'done')"
 
 echo '##########################'

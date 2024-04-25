@@ -1,15 +1,14 @@
 #!/bin/bash
-
+set -e
 source db.config
+source env_table_schema.sh
 
-echo "start clean"
-$mysql_dataset -e "call log('results.sh', 'begin')"
-
-$mysql_dataset < drop_curated.sql
+$mysql_table_schema -e "call log('results.sh', 'begin')"
+$mysql_table_schema < drop_curated.sql
 
 # export CURATED="custom_rxcui_str"
 # export CURATED="all_rxcui_str"
-# export CURATED="VSAC_Mathematica"
+# export CURATED="vsac_math"
 # export CURATED="bioportal"
 # export CURATED="bioportal_to_umls"
 # export CURATED="umls_reviewed_march26"
@@ -21,22 +20,15 @@ if [ -z "$CURATED" ]; then
 fi
 
 echo "Using $CURATED.tsv"
-$mysql_dataset -e "call version('${CURATED}', 'results.sh:begin')"
+$mysql_table_schema -e "call version('${CURATED}', 'results.sh:begin')"
 
 rm -f curated.tsv
 ln -s $CURATED.tsv curated.tsv
 
-$mysql_dataset < curated.sql
-$mysql_dataset < expand.sql
-$mysql_dataset < stats.sql
+$mysql_table_schema < curated.sql
+$mysql_table_schema < expand.sql
+$mysql_table_schema < stats.sql
 
-./backup_curated.sh
-
-#./backup_database.sh curated
-#./backup_database.sh RXNCONSO_curated
-#
-#./backup_database.sh expand
-#
 #./export_tsv.sh stats_expand
 #./export_tsv.sh stats_keywords
 #./export_tsv.sh stats_sab
@@ -45,6 +37,6 @@ $mysql_dataset < stats.sql
 #./export_tsv.sh stats_rel
 #./export_tsv.sh stats_rela
 
-$mysql_dataset -e "call version('${CURATED}', 'results.sh:done')"
-$mysql_dataset -e "call log('results.sh', 'done')"
-$mysql_dataset -e "call mem"
+$mysql_table_schema -e "call version('${CURATED}', 'results.sh:done')"
+$mysql_table_schema -e "call log('results.sh', 'done')"
+$mysql_table_schema -e "call mem"

@@ -5,7 +5,7 @@ call log('drop_curated.sql', 'begin');
 drop table if exists    curated,
                         curated_keywords,
                         RXNCONSO_curated_all_rxcui_str,
-                        RXNCONSO_curated_VSAC_Mathematica,
+                        RXNCONSO_curated_vsac_math,
                         RXNCONSO_curated_bioportal,
                         RXNCONSO_curated_bioportal_to_umls,
                         RXNCONSO_curated_wasz_april7;
@@ -13,7 +13,7 @@ drop table if exists    curated,
 -- RXNCONSO_curated
 drop table if exists    RXNCONSO_curated, RXNCONSO_curated_rela,
                         RXNCONSO_curated_all_rxcui_str,
-                        RXNCONSO_curated_VSAC_Mathematica,
+                        RXNCONSO_curated_vsac_math,
                         RXNCONSO_curated_bioportal,
                         RXNCONSO_curated_bioportal_to_umls,
                         RXNCONSO_curated_wasz_april7,
@@ -26,7 +26,7 @@ drop table if exists RXNREL_curated;
 -- UMLS (expand from curated)
 drop table if exists    expand,
                         expand_all_rxcui_str,
-                        expand_VSAC_Mathematica,
+                        expand_vsac_math,
                         expand_bioportal,
                         expand_bioportal_to_umls,
                         expand_wasz_april7,

@@ -2,13 +2,13 @@ call log('jaccard_all.sql', 'begin');
 
 drop table if exists RXNCONSO_curated, RXNCONSO_curated_jaccard;
 
-create table RXNCONSO_curated_jaccard like RXNCONSO_curated_VSAC_Mathematica;
+create table RXNCONSO_curated_jaccard like RXNCONSO_curated_vsac_math;
 alter table RXNCONSO_curated_jaccard add column curated varchar(100);
 
 call create_index('RXNCONSO_curated_jaccard', 'curated');
 
 insert into RXNCONSO_curated_jaccard
-select *, 'VSAC_Mathematica' as curated from  RXNCONSO_curated_VSAC_Mathematica;
+select *, 'vsac_math' as curated from  RXNCONSO_curated_vsac_math;
 
 insert into RXNCONSO_curated_jaccard
 select *, 'bioportal' as curated from  RXNCONSO_curated_bioportal;
