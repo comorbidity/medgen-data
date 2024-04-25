@@ -1,5 +1,5 @@
 -- ##############################################
-call log('drop_tables.sql', 'begin');
+call log('drop_curated.sql', 'begin');
 
 -- curated
 drop table if exists    curated,
@@ -33,7 +33,7 @@ drop table if exists    expand,
                         expand_jaccard;
 
 
--- Exapnd (REL+RELA Relationship walks) 
+-- Expand (REL+RELA Relationship walks)
 drop table if exists    expand,
                         expand_cui,
                         expand_cui_str,
@@ -56,19 +56,8 @@ drop table if exists    stats_keywords,
                         stats_tui,
                         stats_sab;
 
--- keywords
---    drop table if exists    keywords,
---                            keywords_orig,
---                            keywords_str_in_str;
-
--- UMLS abbreviations
---    drop table if exists umls_rel;
---    drop table if exists umls_rela;
---    drop table if exists umls_tty;
---    drop table if exists umls_tui;
-
 -- ##############################################
-call log('drop_tables.sql', 'done');
+call log('drop_curated.sql', 'done');
 
 
 

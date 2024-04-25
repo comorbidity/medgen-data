@@ -14,8 +14,8 @@ if [ "$#" -lt 1 ]; then
     echo "no DB_TABLE was specified to export"
     exit 1
 else
-    export TSV_FILENAME="$DB_TABLE.tsv"
-    export TSV_FILEPATH="/Users/andy/umls/opioid/tsv/$CURATED/$TSV_FILENAME"
+    export TSV_FILENAME="$CURATED.$DB_TABLE.tsv"
+    export TSV_FILEPATH="/Users/andy/umls/opioid/tsv/$TSV_FILENAME"
 fi
 
 echo '##########################'

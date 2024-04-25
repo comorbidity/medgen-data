@@ -8,15 +8,14 @@ if [ -z "$CURATED" ]; then
 fi
 
 source db.config
-export DB_TABLE=$1
 
 if [ "$#" -lt 1 ]; then
     export DB_FILE="$CURATED.mysqldump"
 else
     export DB_FILE="$CURATED.$DB_TABLE.mysqldump"
-fi 
+fi
 
-export DB_DUMP="mysqldump --skip-lock-tables -u $DB_USER -p$DB_PASS -h $DB_HOST --port $DB_PORT  $DATASET $DB_TABLE" 
+export DB_DUMP="mysqldump --skip-lock-tables -u $DB_USER -p$DB_PASS -h $DB_HOST --port $DB_PORT  $DATASET $DB_TABLE"
 
 echo '##########################' 
 echo " CURATED  = $CURATED"
@@ -25,6 +24,8 @@ echo " DB_FILE  = $DB_FILE "
 echo " DB_DUMP  = $DB_DUMP " 
 echo '##########################'
 
-$DB_DUMP > $DATASET/mysqldump/$DB_FILE
+mkdir -p mysqldump
+
+$DB_DUMP > mysqldump/$DB_FILE
 
 echo '##########################'

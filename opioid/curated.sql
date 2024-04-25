@@ -46,23 +46,6 @@ where C.RXCUI = curated.RXCUI
 order by RXCUI,STR
 ;
 
--- ##############################################
-call log('RXNCONSO_curated_keywords', 'refresh');
-
-drop table if exists RXNCONSO_curated_keywords;
-
-create table RXNCONSO_curated_keywords
-select distinct
-    C.RXCUI,
-    C.STR,
-    C.TTY,
-    C.SAB,
-    K.STR as keyword_str,
-    K.LEN as keyword_len
-from RXNCONSO_curated C, keywords K
-where lower(C.STR) like concat('%',K.STR, '%')
-order by K.STR, K.LEN;
-
 update RXNCONSO_curated C, keywords K
 set
     C.keyword_str = K.STR,
@@ -72,6 +55,23 @@ where lower(C.STR) like concat('%',K.STR, '%')
 
 call create_index('RXNCONSO_curated','STR(255)');
 call create_index('RXNCONSO_curated','RXCUI');
+
+-- ##############################################
+--    call log('RXNCONSO_curated_keywords', 'refresh');
+--
+--    drop table if exists RXNCONSO_curated_keywords;
+--
+--    create table RXNCONSO_curated_keywords
+--    select distinct
+--        C.RXCUI,
+--        C.STR,
+--        C.TTY,
+--        C.SAB,
+--        K.STR as keyword_str,
+--        K.LEN as keyword_len
+--    from RXNCONSO_curated C, keywords K
+--    where lower(C.STR) like concat('%',K.STR, '%')
+--    order by K.STR, K.LEN;
 
 -- ##############################################
 call log('RXNSTY_curated', 'refresh');
