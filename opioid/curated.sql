@@ -35,7 +35,7 @@ create table curated
         order by trim(STR);
 
 call create_index('curated','RXCUI');
-call create_index('curated','STR');
+call create_index('curated','STR(255)');
 
 -- ##############################################
 call log('RXNCONSO_curated', 'refresh'); 

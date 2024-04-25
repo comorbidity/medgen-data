@@ -1,56 +1,102 @@
 -- ##############################################
 call log('stats.sql', 'begin');
 
--- ##############################################
-drop table if exists stats_sab; -- RXNORM vocab summary
+-- ############################################## (curated)
+-- SAB RXNORM vocab summary
+drop    table if exists stats_sab;
+create  table           stats_sab
+select  count(*) as cnt_star,
+        count(distinct RXCUI) as cnt_rxcui,
+        SAB
+from    RXNCONSO_curated
+group by SAB
+order by cnt_rxcui desc;
 
-create table stats_sab as
-select SAB, count(distinct RXCUI) as cnt from RXNCONSO_curated group by SAB order by cnt desc;
+-- ############################################## (curated)
+-- STR matches %keyword%
+drop    table if exists stats_keywords;
+create  table           stats_keywords
+select  count(*) as cnt_star,
+        count(distinct RXCUI) as cnt_rxcui,
+        keyword_str
+from    RXNCONSO_curated
+group by keyword_str
+order by cnt_rxcui desc;
 
--- ##############################################
-drop table if exists stats_keywords; -- STR matches Keyword
+-- ############################################## (curated)
+-- TTY TermType
+drop    table if exists stats_tty;
+create  table           stats_tty as
+select  count(*) as cnt_star,
+        count(distinct RXCUI) as cnt_rxcui,
+        U.TTY,
+        U.TTY_STR
+from    RXNCONSO_curated C,
+        umls_tty U
+where   C.tty=U.tty
+group by U.TTY, U.TTY_STR
+order by cnt_rxcui desc;
 
-create table stats_keywords as
-select keyword_str, count(distinct RXCUI) as cnt from RXNCONSO_curated group by keyword_str order by cnt desc;
+-- ############################################## (curated)
+-- TUI SemanticType
+drop    table if exists stats_tui;
+create  table           stats_tui as
+select  count(*) as cnt_star,
+        count(distinct RXCUI) as cnt_rxcui,
+        U.TUI,
+        U.TUI_STR
+from    RXNSTY_curated C,
+        umls_tui U
+where   C.TUI=U.TUI
+group by U.TUI,U.TUI_STR
+order by cnt_rxcui desc;
 
--- ##############################################
-drop table if exists stats_tty; -- Term Types
+-- ############################################## (expand)
+-- RXCUI1:RXCUI2
+drop    table if exists stats_expand_cui1_cui2;
+create  table           stats_expand_cui1_cui2 as
+select  count(*)                as cnt_star,
+        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI2)  as cnt_rxcui2
+from    expand;
 
-create table stats_tty as
-select C.TTY,TTY_STR, count(distinct RXCUI) as cnt from RXNCONSO_curated C, umls_tty U where C.tty=U.tty group by C.TTY,TTY_STR order by cnt desc;
-
--- ##############################################
-drop table if exists stats_tui; -- Semantic Types
-
-create table stats_tui as
-select C.TUI,TUI_STR, count(distinct RXCUI) as cnt from RXNSTY_curated C, umls_tui U where C.tui=U.tui group by C.tui,TUI_STR order by cnt desc;
-
--- ##############################################
-drop table if exists stats_expand; -- Expand (relationships)
-
-create table stats_expand as
-select count(distinct RXCUI) cnt_rxcui1, count(distinct RXCUI2) cnt_rxcui2 from expand;
-
--- ##############################################
-drop table if exists stats_rel; -- REL concepts
-
-create table stats_rel as 
-select C.REL,REL_STR,
-        count(distinct RXCUI) as cnt_rxcui1,
-        count(distinct RXCUI2) as cnt_rxcui2
-from RXNCONSO_curated_rela C, umls_rel U
-where C.rel=U.rel group by C.rel,REL_STR
+-- ############################################## (expand)
+-- REL "broader", "narrower", "other"
+drop    table if exists stats_expand_rel;
+create  table           stats_expand_rel as
+select  count(*)                as cnt_star,
+        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI2)  as cnt_rxcui2,
+        U.REL, U.REL_STR
+from    expand E, umls_rel U
+where   E.REL=U.REL
+group by U.REL, U.REL_STR
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
--- ##############################################
-drop table if exists stats_rela; -- REL Attributes
+-- ############################################## (expand)
+-- REL Attributes
+drop    table if exists stats_expand_rela;
+create  table           stats_expand_rela as
+select  count(*)                as cnt_star,
+        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI2)  as cnt_rxcui2,
+        RELA
+from    expand E
+group by RELA
+order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
-create table stats_rela as 
-select C.REL, C.RELA,
-        count(distinct RXCUI) as cnt_rxcui1,
-        count(distinct RXCUI2) as cnt_rxcui2
-from RXNCONSO_curated_rela C, umls_rel U
-where C.rel=U.rel group by C.REL, C.RELA
+-- ############################################## (expand)
+-- REL Attributes TTY TermTypes
+drop    table if exists stats_expand_rela_tty;
+create  table           stats_expand_rela_tty as
+select  count(*) as cnt_star,
+        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI2)  as cnt_rxcui2,
+        RELA,
+        TTY,
+        TTY2
+from    expand E
+group by RELA, TTY, TTY2
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
 -- ##############################################
