@@ -1,0 +1,27 @@
+CDA	Clinical drug name in abbreviated format	21
+CDC	Clinical drug name in concatenated format (NDDF)	21
+CDD	Clinical drug name in delimited format	21
+IN	Name for an ingredient	17
+CD	Clinical Drug	15
+PT	Designated preferred name	14
+FN	Full form of descriptor	11
+SCD	Semantic Clinical Drug	11
+SCDC	Semantic Drug Component	8
+BD	Fully-specified drug brand name that can be prescribed	7
+SCDF	Semantic clinical drug and form	7
+SY	Designated synonym	6
+BN	Fully-specified drug brand name that can not be prescribed	5
+MIN	name for a multi-ingredient	4
+PSN	Prescribable Names	4
+SBDC	Semantic Branded Drug Component	4
+SBDG	Semantic branded drug group	4
+AB	Abbreviation in any source vocabulary	3
+DP	Drug Product	3
+SBD	Semantic branded drug	3
+SBDF	Semantic branded drug and form	3
+RXN_PT	Rxnorm Preferred	2
+SCDGP	Semantic clinical drug group w/ precise ingredient as basis strength	2
+GN	Generic drug name	1
+RXN_IN	Rxnorm Preferred Ingredient	1
+SBDFP	Semantic branded drug and form w/ precise ingredient as basis strength	1
+TMSY	Tall Man synonym	1

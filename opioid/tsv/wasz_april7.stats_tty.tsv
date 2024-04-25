@@ -1,0 +1,37 @@
+TMSY	Tall Man synonym	5152
+SY	Designated synonym	2329
+BD	Fully-specified drug brand name that can be prescribed	1615
+SCD	Semantic Clinical Drug	1515
+PSN	Prescribable Names	1352
+SBD	Semantic branded drug	1326
+SBDC	Semantic Branded Drug Component	1079
+CD	Clinical Drug	1066
+CDA	Clinical drug name in abbreviated format	897
+CDC	Clinical drug name in concatenated format (NDDF)	897
+CDD	Clinical drug name in delimited format	897
+SBDG	Semantic branded drug group	847
+SCDG	Semantic clinical drug group	726
+SBDF	Semantic branded drug and form	708
+SBDFP	Semantic branded drug and form w/ precise ingredient as basis strength	659
+DP	Drug Product	609
+SCDC	Semantic Drug Component	589
+SCDF	Semantic clinical drug and form	583
+AB	Abbreviation in any source vocabulary	506
+BN	Fully-specified drug brand name that can not be prescribed	490
+PT	Designated preferred name	485
+FN	Full form of descriptor	485
+SCDFP	Semantic clinical drug and form w/ precise ingredient as basis strength	433
+MIN	name for a multi-ingredient	279
+IN	Name for an ingredient	203
+SCDGP	Semantic clinical drug group w/ precise ingredient as basis strength	192
+GN	Generic drug name	181
+MTH_RXN_CD	RxNorm Created CD	67
+SU	Active Substance	54
+MTH_RXN_BD	RxNorm Created BD	52
+PIN	Name from a precise ingredient	45
+MTH_RXN_DP	RxNorm Created DP	28
+FSY	Foreign Synonym	23
+MTH_RXN_CDC	RxNorm Created CDC	21
+GPCK	Generic Drug Delivery Device	3
+SYGB	British synonym	3
+BPCK	Branded Drug Delivery Device	2
