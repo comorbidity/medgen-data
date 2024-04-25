@@ -2,6 +2,11 @@
 
 source db.config
 
+################################################################################
+$mysql_dataset < umls_abbreviations.sql
+$mysql_dataset < keywords.sql
+$mysql_dataset < version.sql
+
 $mysql_dataset -e "call log('results_all.sh', 'begin')"
 
 export CURATED="custom_rxcui_str"
@@ -24,4 +29,4 @@ export CURATED="wasz_april7"
 
 $mysql_dataset -e "call log('results_all.sh', 'done')"
 
-############################################################
+################################################################################

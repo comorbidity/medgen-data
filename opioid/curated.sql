@@ -1,5 +1,5 @@
 -- ##############################################
-call log('curated', 'create table');
+call log('curated.sql', 'create table');
 
 drop table if exists curated;
 create table curated
@@ -11,7 +11,7 @@ create table curated
 call log('infile', 'curated.tsv');
 
 load    data local infile 'curated.tsv'
-into    table keywords
+into    table curated
         fields      terminated by '\t'
         optionally  enclosed by '"' ESCAPED BY ''
         lines       terminated by '\n'
@@ -20,22 +20,7 @@ into    table keywords
 show warnings; 
 
 call create_index('curated','RXCUI');
-call create_index('curated','STR(');
-
--- ##############################################
-call log('curated_keywords', 'refresh');
-
-drop table if exists curated_keywords;
-
-create table curated_keywords
-select distinct
-    C.RXCUI,
-    C.STR,
-    K.STR as keyword_str,
-    K.LEN as keyword_len
-from curated C, keywords K
-where C.STR like concat('%',K.STR, '%')
-order by K.STR, K.LEN;
+call create_index('curated','STR(255)');
 
 -- ##############################################
 call log('RXNCONSO_curated', 'refresh'); 
@@ -48,11 +33,8 @@ CREATE TABLE RXNCONSO_curated
     STR     varchar(3000)   NOT NULL,
     TTY     varchar(20) NOT NULL,
     SAB     varchar(20) NOT NULL,
-    keyword_bool tinyint(1) default 0,
-    keyword_min     varchar(30) NULL,
-    keyword_min_len int NULL,
-    keyword_max     varchar(30) NULL,
-    keyword_max_len int NULL
+    keyword_str varchar(50) NULL,
+    keyword_len int NULL
 );
 
 insert into RXNCONSO_curated
@@ -61,22 +43,31 @@ select distinct
     C.RXCUI, C.STR, C.TTY, C.SAB
 from rxnorm.RXNCONSO as C, curated
 where C.RXCUI = curated.RXCUI
+order by RXCUI,STR
 ;
+
+-- ##############################################
+call log('RXNCONSO_curated_keywords', 'refresh');
+
+drop table if exists RXNCONSO_curated_keywords;
+
+create table RXNCONSO_curated_keywords
+select distinct
+    C.RXCUI,
+    C.STR,
+    C.TTY,
+    C.SAB,
+    K.STR as keyword_str,
+    K.LEN as keyword_len
+from RXNCONSO_curated C, keywords K
+where lower(C.STR) like concat('%',K.STR, '%')
+order by K.STR, K.LEN;
 
 update RXNCONSO_curated C, keywords K
 set
-    C.keyword_min = K.STR,
-    C.keyword_min_len = K.LEN
-where C.STR like concat('%',K.STR, '%')
-order by K.LEN ASC
-;
-
-update RXNCONSO_curated C, keywords K
-set
-    C.keyword_max = K.STR,
-    C.keyword_max_len = K.LEN
-where C.STR like concat('%',K.STR, '%')
-order by K.len DESC
+    C.keyword_str = K.STR,
+    C.keyword_len = K.LEN
+where lower(C.STR) like concat('%',K.STR, '%')
 ;
 
 call create_index('RXNCONSO_curated','STR(255)');
@@ -122,119 +113,4 @@ call create_index('RXNCONSO_curated_rela','REL');
 call create_index('RXNCONSO_curated_rela','RELA');
 
 -- ##############################################
-call log('expand', 'refresh'); 
-
-drop table if exists expand;
-
-create table expand
-select distinct RXCUI,RXCUI1,RXCUI2,SAB,TTY,REL,RELA,STR from RXNCONSO_curated_rela
-where RXCUI=RXCUI2 and RXCUI2 not in (select distinct RXCUI from RXNCONSO_curated); 
-
-call create_index('expand','RXCUI');
-call create_index('expand','RXCUI1');
-call create_index('expand','RXCUI2'); 
--- call create_index('expand','REL');
--- call create_index('expand','RELA');
--- call create_index('expand','TTY');
-
--- ##############################################
-call log('expand_cui', 'refresh'); 
-
-drop table if exists expand_cui;
-create table expand_cui
-select distinct RXCUI from expand order by RXCUI ;
-
-call create_index('expand_cui','RXCUI');
-
--- ##############################################
-call log('expand_cui_str', 'refresh'); 
-
-drop table if exists expand_cui_str;
-create table expand_cui_str
-select distinct RXCUI,STR from expand order by RXCUI, STR ;
-
-call create_index('expand_cui_str','RXCUI');
-
--- ##############################################
-call log('expand_cui_rela_str', 'refresh'); 
-
-drop table if exists expand_cui_rela_str;
-create table expand_cui_rela_str
-select distinct RXCUI,RELA,STR from expand order by RXCUI, RELA, STR ;
-
-call create_index('expand_cui_rela_str','RXCUI');
-
--- ##############################################
-call log('expand_cui_rela_cui', 'refresh'); 
-
-drop table if exists expand_cui_rela_cui;
-create table expand_cui_rela_cui
-select distinct RXCUI,RXCUI1,RELA,RXCUI2 from expand order by RXCUI,RXCUI1,RELA,RXCUI2 ;
-
-call create_index('expand_cui_rela_cui','RXCUI');
-
--- ##############################################
-call log('expand_tradename', 'refresh'); 
-
-drop table if exists expand_tradename;
-create table expand_tradename
-select distinct RXCUI,RELA, STR from expand where RELA in ('has_tradename', 'tradename_of') order by RXCUI,RELA, STR ;
-
-call create_index('expand_tradename','RXCUI');
-
--- ##############################################
-call log('expand_consists', 'refresh'); 
-
-drop table if exists expand_consists;
-create table expand_consists
-select distinct RXCUI,RELA, STR from expand where RELA in ('consists_of', 'constitutes') order by RXCUI,RELA, STR ;
-
-call create_index('expand_consists','RXCUI');
-
--- ##############################################
-call log('expand_isa', 'refresh'); 
-
-drop table if exists expand_isa;
-create table expand_isa
-select distinct RXCUI,RELA, STR from expand where RELA in ('isa', 'inverse_isa') order by RXCUI,RELA, STR ;
-
-call create_index('expand_isa','RXCUI');
-
--- ##############################################
-call log('expand_ingredient', 'refresh'); 
-
-drop table if exists expand_ingredient;
-create table expand_ingredient
-select distinct RXCUI,RELA, STR from expand where RELA in ('has_ingredient', 'ingredient_of', 'has_precise_ingredient', 'precise_ingredient_of') order by RXCUI,RELA, STR ;
-
-call create_index('expand_ingredient','RXCUI');
-
--- ##############################################
-call log('expand_ingredients', 'refresh'); 
-
-drop table if exists expand_ingredients;
-create table expand_ingredients
-select distinct RXCUI,RELA, STR from expand where RELA in ('has_ingredients', 'ingredients_of') order by RXCUI,RELA, STR ;
-
-call create_index('expand_ingredients','RXCUI');
-
--- ##############################################
-call log('expand_doseform', 'refresh'); 
-
-drop table if exists expand_doseform;
-create table expand_doseform
-select distinct RXCUI,RELA, STR from expand where RELA in ('dose_form_of', 'has_dose_form', 'doseformgroup_of', 'has_doseformgroup') order by RXCUI,RELA, STR ;
-
-call create_index('expand_doseform ','RXCUI');
-
--- ##############################################
-call log('expand_form', 'refresh'); 
-
-drop table if exists expand_form;
-create table expand_form
-select distinct RXCUI,RELA, STR from expand where RELA in ('form_of', 'has_form') order by RXCUI,RELA, STR ;
-
-call create_index('expand_form ','RXCUI');
-
--- ##############################################
-call log('curated', 'done.');
+call log('curated.sql', 'done.');

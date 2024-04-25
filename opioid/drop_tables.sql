@@ -1,11 +1,6 @@
 -- ##############################################
 call log('drop_tables.sql', 'begin');
 
--- keywords
-drop table if exists    keywords,
-                        keywords_orig,
-                        keywords_str_in_str;
-
 -- curated
 drop table if exists    curated,
                         curated_keywords,
@@ -60,6 +55,11 @@ drop table if exists    stats_keywords,
                         stats_rela,
                         stats_tui,
                         stats_sab;
+
+-- keywords
+--    drop table if exists    keywords,
+--                            keywords_orig,
+--                            keywords_str_in_str;
 
 -- UMLS abbreviations
 --    drop table if exists umls_rel;

@@ -6,6 +6,7 @@ fi
 pushd .
 cd mysqldump
 
+$mysql_dataset -e "call log('jaccard.sh', 'begin')"
 echo "###############################################################################"
 $mysql_dataset -e "call log('jaccard.sh', '$CURATED')"
 
@@ -20,5 +21,6 @@ $mysql_dataset -e "rename table curated to curated_$CURATED"
 $mysql_dataset < opioid.expand.$CURATED.mysqldump
 $mysql_dataset -e "rename table expand to expand_$CURATED"
 echo "###############################################################################"
+$mysql_dataset -e "call log('jaccard.sh', 'done')"
 
 popd

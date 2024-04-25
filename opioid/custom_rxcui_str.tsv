@@ -1,4 +1,4 @@
-RXCUI	STR
+#RXCUI	STR
 2374034	ALUMINUM CHLOROHYDRATE 200 mg in 1 mL TOPICAL LIQUID [AFRICAN OPIUM]
 312097	ASA 150 MG / Caffeine 8 MG / Ipecac 1.5 MG / Opium 1.5 MG Oral Tablet
 312100	ASA 324 MG / Caffeine 32 MG / Ipecac 2.43 MG / Opium 2.43 MG Oral Capsule
@@ -162,10 +162,9 @@ RXCUI	STR
 1012164	Cocet Plus Oral Tablet
 1012164	Cocet Plus, 650 mg-60 mg oral tablet
 1012160	Cocet, 650 mg-30 mg oral tablet
-215477  Atuss G
-860428  Atuss G (guaifenesin 100 MG / hydrocodone bitartrate 2 MG / phenylephrine HCl 10 MG) per 5 ML Syrup
-860428  Atuss G 100mg-2mg-10mg/5ml Syrup
-1173594 Atuss G Oral Liquid Product
-1173595 Atuss G Oral Product
-860428  Atuss G, 100 mg-2 mg-10 mg/5 mL oral syrup
-
+215477	Atuss G
+860428	Atuss G (guaifenesin 100 MG / hydrocodone bitartrate 2 MG / phenylephrine HCl 10 MG) per 5 ML Syrup
+860428	Atuss G 100mg-2mg-10mg/5ml Syrup
+1173594	Atuss G Oral Liquid Product
+1173595	Atuss G Oral Product
+860428	Atuss G, 100 mg-2 mg-10 mg/5 mL oral syrup

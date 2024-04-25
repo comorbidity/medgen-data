@@ -11,7 +11,7 @@ select SAB, count(distinct RXCUI) as cnt from RXNCONSO_curated group by SAB orde
 drop table if exists stats_keywords; -- STR matches Keyword
 
 create table stats_keywords as
-select count(distinct RXCUI) as cnt from RXNCONSO_curated where keyword_min is not null;
+select keyword_str, count(distinct RXCUI) as cnt from RXNCONSO_curated group by keyword_str order by cnt desc;
 
 -- ##############################################
 drop table if exists stats_tty; -- Term Types

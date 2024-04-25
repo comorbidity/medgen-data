@@ -6,7 +6,6 @@ echo "start clean"
 $mysql_dataset -e "call log('results.sh', 'begin')"
 
 $mysql_dataset < drop_tables.sql
-$mysql_dataset < create_tables.sql
 
 # export CURATED="custom_rxcui_str"
 # export CURATED="all_rxcui_str"
@@ -22,30 +21,31 @@ if [ -z "$CURATED" ]; then
 fi
 
 echo "Using $CURATED.tsv"
-$mysql_dataset -e "call log('CURATED', '${CURATED}')"
-$mysql_dataset -e "call log('${CURATED}', 'begin')"
+$mysql_dataset -e "call version('${CURATED}', 'results.sh:begin')"
 
 rm -f curated.tsv
 ln -s $CURATED.tsv curated.tsv
 
 $mysql_dataset < curated.sql
+$mysql_dataset < expand.sql
 $mysql_dataset < stats.sql
 
-pushd .
-cd ..
-./backup_curated.sh opioid RXNCONSO_curated
-./backup_curated.sh opioid curated
-./backup_curated.sh opioid expand
+./backup_curated.sh curated
+./backup_curated.sh RXNCONSO_curated
+./backup_curated.sh RXNCONSO_curated_keywords
 
-./export_tsv.sh opioid stats_expand
-./export_tsv.sh opioid stats_keywords
-./export_tsv.sh opioid stats_sab
-./export_tsv.sh opioid stats_tty
-./export_tsv.sh opioid stats_tui
-./export_tsv.sh opioid stats_rel
-./export_tsv.sh opioid stats_rela
+./backup_curated.sh expand
+
+./export_tsv.sh stats_expand
+./export_tsv.sh stats_keywords
+./export_tsv.sh stats_sab
+./export_tsv.sh stats_tty
+./export_tsv.sh stats_tui
+./export_tsv.sh stats_rel
+./export_tsv.sh stats_rela
+
+$mysql_dataset -e "call version('${CURATED}', 'results.sh:done')"
 
 cd opioid
 
-$mysql_dataset -e "call log('${CURATED}', 'done')"
 $mysql_dataset -e "call log('results.sh', 'done')"

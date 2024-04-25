@@ -47,7 +47,10 @@ order by
     length(K1.STR) desc,
     length(K2.STR) asc;
 
+-- #############################################################################
 call log('keywords', 'deleting longer pattern');
 select STR1, STR2 from keywords_str_in_str;
 
 delete from keywords where STR in (select STR1 from keywords_str_in_str);
+
+
