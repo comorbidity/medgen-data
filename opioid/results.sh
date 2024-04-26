@@ -38,7 +38,7 @@ $mysql_table_schema < stats.sql
 ./export_tsv.sh stats_expand_rela
 ./export_tsv.sh stats_expand_rela_tty
 
-./export_tsv.sh RXNCONSO_curated
+./export_tsv.sh curated
 ./export_tsv.sh keywords
 ./export_tsv.sh expand
 ./export_tsv.sh expand_tradename

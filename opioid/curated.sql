@@ -28,7 +28,9 @@ call log('curated', 'curated_orig');
 
 rename  table   curated to curated_orig;
 create  table   curated
-select  distinct trim(STR) as STR
+select  distinct
+        trim(RXCUI) as RXCUI,
+        trim(STR)   as STR
 from    curated_orig
 order by trim(STR);
 
@@ -45,8 +47,8 @@ create  table               RXNCONSO_curated
     STR     varchar(3000)   NOT NULL,
     TTY     varchar(20)     NOT NULL,
     SAB     varchar(20)     NOT NULL,
-    keyword_str varchar(50) default '',
-    keyword_len int         default 0
+    keyword_str varchar(50) NULL,
+    keyword_len int         NULL
 );
 
 insert  into RXNCONSO_curated

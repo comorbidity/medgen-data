@@ -21,3 +21,5 @@ export CURATED="custom_rxcui_str"
 export CURATED="all_rxcui_str"
 ./drop_database.sh
 
+export CURATED="opioid"
+./drop_database.sh
