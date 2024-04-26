@@ -13,28 +13,27 @@ select * from bioportal.stats_expand;
 --    |       2007 |       4308 |
 --    +------------+------------+
 
-select * from bioportal.stats_rela;
+select * from bioportal.stats_expand_rela;
 
---    +------+-----------------------+------------+------------+
---    | REL  | RELA                  | cnt_rxcui1 | cnt_rxcui2 |
---    +------+-----------------------+------------+------------+
---    | RO   | ingredient_of         |       1571 |        165 | -eXclude
---    | RO   | dose_form_of          |       1033 |         28 | -eXclude
---    | RB   | inverse_isa           |       1031 |        900 |
---    | RB   | has_tradename         |        918 |        817 | +include
---    | RN   | tradename_of          |        913 |       3070 | +include
---    | RN   | isa                   |        726 |       1865 |
---    | RO   | constitutes           |        726 |        601 | ?include
---    | RO   | consists_of           |        553 |       2079 | ? no
---    | RO   | doseformgroup_of      |        421 |         16 | -eXclude
---    | RN   | form_of               |        415 |        446 | -eXclude
---    | RB   | has_quantified_form   |        192 |        166 | ?include
---    | RO   | precise_ingredient_of |        191 |         21 | ?
---    | RO   | ingredients_of        |        173 |         44 | -eXclude
---    | RN   | quantified_form_of    |         13 |         20 | ?include
---    | RN   | contains              |          5 |          5 |
---    | RB   | contained_in          |          2 |          2 |
---    +------+-----------------------+------------+------------+
+--    +----------+------------+------------+-----------------------+
+--    | cnt_star | cnt_rxcui1 | cnt_rxcui2 | RELA                  |
+--    +----------+------------+------------+-----------------------+
+--    |    32761 |       1571 |        165 | ingredient_of         |
+--    |    15525 |       1033 |         28 | dose_form_of          |
+--    |    14660 |        565 |        229 | inverse_isa           |
+--    |    62488 |        521 |       2181 | tradename_of          |
+--    |      782 |        421 |         16 | doseformgroup_of      |
+--    |     1333 |        415 |        446 | form_of               |
+--    |    21468 |        412 |        841 | isa                   |
+--    |     2128 |        321 |        197 | has_tradename         |
+--    |    13937 |        298 |       1354 | consists_of           |
+--    |     4765 |        264 |         90 | constitutes           |
+--    |     2004 |        191 |         21 | precise_ingredient_of |
+--    |    15332 |        190 |        164 | has_quantified_form   |
+--    |    16101 |        173 |         44 | ingredients_of        |
+--    |     1199 |         13 |         18 | quantified_form_of    |
+--    |      207 |          3 |          3 | contains              |
+--    +----------+------------+------------+-----------------------+
 
 -- ###############################################################
 -- KEYWORDS comparison
@@ -47,19 +46,20 @@ group by keyword_len order by keyword_len asc;
 --    +-------------+-----+
 --    | keyword_len | cnt |
 --    +-------------+-----+
---    |        NULL | 166 |
---    |           5 |  52 |
---    |           6 |  91 |
---    |           7 | 590 |
+--    |        NULL | 177 |
+--    |           5 |  48 |
+--    |           6 |  86 |
+--    |           7 | 586 |
 --    |           8 | 764 |
 --    |           9 | 287 |
---    |          10 | 154 |
+--    |          10 | 157 |
 --    |          11 |  36 |
 --    |          12 |   1 |
 --    |          13 | 129 |
 --    |          14 |   1 |
 --    |          15 |   5 |
 --    +-------------+-----+
+
 
 select keyword_len, count(distinct RXCUI) cnt
 from all_rxcui_str.RXNCONSO_curated
@@ -69,37 +69,26 @@ group by keyword_len order by keyword_len asc;
 --    +-------------+--------+
 --    | keyword_len | cnt    |
 --    +-------------+--------+
---    |        NULL | 380381 |
+--    |        NULL | 380565 |
 --    |           4 |      3 |
---    |           5 |    250 |
---    |           6 |    650 |
---    |           7 |   3281 |
---    |           8 |   4706 |
+--    |           5 |    173 |
+--    |           6 |    564 |
+--    |           7 |   3207 |
+--    |           8 |   4670 |
 --    |           9 |    898 |
---    |          10 |    620 |
---    |          11 |    217 |
---    |          12 |     31 |
+--    |          10 |    647 |
+--    |          11 |    219 |
+--    |          12 |     32 |
 --    |          13 |    253 |
 --    |          14 |     10 |
 --    |          15 |     11 |
 --    +-------------+--------+
 
 -- #####
--- AND (set intersection)
-
-drop    table if exists opioid.all_keywords_AND_bioportal;
-create  table opioid.all_keywords_AND_bioportal
-select  distinct B.*
-from    all_rxcui_str.RXNCONSO_curated A,
-        bioportal.RXNCONSO_curated B
-where   A.RXCUI = B.RXCUI
-and     A.keyword_len > 1;
-
--- #####
 -- DIFF (set difference)
 
 drop    table if exists opioid.all_keywords_DIFF_bioportal;
-create  table opioid.all_keywords_DIFF_bioportal
+create  table           opioid.all_keywords_DIFF_bioportal
 select  distinct A.*
 from    all_rxcui_str.RXNCONSO_curated A
 where   A.keyword_len > 1
@@ -110,7 +99,8 @@ and     A.RXCUI not in (select distinct RXCUI from bioportal.RXNCONSO_curated);
 
 -- ####
 -- TTY Term Types
-select  U.TTY, U.TTY_STR, count(distinct C.RXCUI) as cnt
+select  count(distinct C.RXCUI) as cnt,
+        U.TTY, U.TTY_STR
 from    all_rxcui_str.RXNCONSO_curated C,
         opioid.all_keywords_DIFF_bioportal D,
         umls_tty U
@@ -120,83 +110,109 @@ group by U.TTY, U.TTY_STR
 order by cnt desc;
 
 --     (all_rxcui_str)
---    +-------------+-------------------------------------------------------------------------+------+
---    | TTY         | TTY_STR                                                                 | cnt  |
---    +-------------+-------------------------------------------------------------------------+------+
---    | TMSY        | Tall Man synonym                                                        | 3445 |
---    | SY          | Designated synonym                                                      | 1735 |
---    | BD          | Fully-specified drug brand name that can be prescribed                  | 1226 |
---    | CD          | Clinical Drug                                                           | 1058 |
---    | SBD         | Semantic branded drug                                                   | 1029 |
---    | SCD         | Semantic Clinical Drug                                                  |  979 |
---    | SBDC        | Semantic Branded Drug Component                                         |  850 |
---    | CDA         | Clinical drug name in abbreviated format                                |  739 |
---    | CDC         | Clinical drug name in concatenated format (NDDF)                        |  739 |
---    | CDD         | Clinical drug name in delimited format                                  |  739 |
---    | SBDFP       | Semantic branded drug and form w/ precise ingredient as basis strength  |  728 |
---    | BN          | Fully-specified drug brand name that can not be prescribed              |  705 |
---    | SBDG        | Semantic branded drug group                                             |  692 |
---    | SBDF        | Semantic branded drug and form                                          |  657 |
---    | PSN         | Prescribable Names                                                      |  579 |
---    | PT          | Designated preferred name                                               |  511 |
---    | FN          | Full form of descriptor                                                 |  510 |
---    | SCDGP       | Semantic clinical drug group w/ precise ingredient as basis strength    |  394 |
---    | IN          | Name for an ingredient                                                  |  325 |
---    | SCDFP       | Semantic clinical drug and form w/ precise ingredient as basis strength |  287 |
---    | SCDG        | Semantic clinical drug group                                            |  272 |
---    | AB          | Abbreviation in any source vocabulary                                   |  271 |
---    | SCDC        | Semantic Drug Component                                                 |  210 |
---    | SCDF        | Semantic clinical drug and form                                         |  193 |
---    | DP          | Drug Product                                                            |  185 |
---    | MIN         | name for a multi-ingredient                                             |  172 |
---    | GN          | Generic drug name                                                       |  154 |
---    | SU          | Active Substance                                                        |   89 |
---    | PIN         | Name from a precise ingredient                                          |   48 |
---    | FSY         | Foreign Synonym                                                         |   44 |
---    | MTH_RXN_BD  | RxNorm Created BD                                                       |   10 |
---    | MTH_RXN_CD  | RxNorm Created CD                                                       |    9 |
---    | PTGB        | British preferred term                                                  |    8 |
---    | MS          | Multum names of branded and generic supplies or supplements             |    6 |
---    | MTH_RXN_DP  | RxNorm Created DP                                                       |    5 |
---    | MTH_RXN_CDC | RxNorm Created CDC                                                      |    5 |
---    | SYGB        | British synonym                                                         |    5 |
---    | BPCK        | Branded Drug Delivery Device                                            |    3 |
---    | GPCK        | Generic Drug Delivery Device                                            |    2 |
---    | RXN_PT      | Rxnorm Preferred                                                        |    1 |
---    +-------------+-------------------------------------------------------------------------+------+
+--    +------+-------------+-------------------------------------------------------------------------+
+--    | cnt  | TTY         | TTY_STR                                                                 |
+--    +------+-------------+-------------------------------------------------------------------------+
+--    | 3440 | TMSY        | Tall Man synonym                                                        |
+--    | 1669 | SY          | Designated synonym                                                      |
+--    | 1186 | BD          | Fully-specified drug brand name that can be prescribed                  |
+--    | 1031 | CD          | Clinical Drug                                                           |
+--    | 1011 | SBD         | Semantic branded drug                                                   |
+--    |  962 | SCD         | Semantic Clinical Drug                                                  |
+--    |  841 | SBDC        | Semantic Branded Drug Component                                         |
+--    |  725 | CDA         | Clinical drug name in abbreviated format                                |
+--    |  725 | CDC         | Clinical drug name in concatenated format (NDDF)                        |
+--    |  725 | CDD         | Clinical drug name in delimited format                                  |
+--    |  724 | SBDFP       | Semantic branded drug and form w/ precise ingredient as basis strength  |
+--    |  666 | BN          | Fully-specified drug brand name that can not be prescribed              |
+--    |  661 | SBDG        | Semantic branded drug group                                             |
+--    |  649 | SBDF        | Semantic branded drug and form                                          |
+--    |  558 | PSN         | Prescribable Names                                                      |
+--    |  484 | PT          | Designated preferred name                                               |
+--    |  483 | FN          | Full form of descriptor                                                 |
+--    |  394 | SCDGP       | Semantic clinical drug group w/ precise ingredient as basis strength    |
+--    |  287 | SCDFP       | Semantic clinical drug and form w/ precise ingredient as basis strength |
+--    |  281 | IN          | Name for an ingredient                                                  |
+--    |  272 | SCDG        | Semantic clinical drug group                                            |
+--    |  249 | AB          | Abbreviation in any source vocabulary                                   |
+--    |  210 | SCDC        | Semantic Drug Component                                                 |
+--    |  193 | SCDF        | Semantic clinical drug and form                                         |
+--    |  172 | MIN         | name for a multi-ingredient                                             |
+--    |  170 | DP          | Drug Product                                                            |
+--    |  135 | GN          | Generic drug name                                                       |
+--    |   59 | SU          | Active Substance                                                        |
 
 -- ####
 -- REL Relationships
 
-select  U.REL, U.REL_STR,
-        count(distinct A.RXCUI) as cnt_rxcui1,
-        count(distinct A.RXCUI2) as cnt_rxcui2
+select  count(distinct A.RXCUI)  as cnt_rxcui1,
+        count(distinct A.RXCUI2) as cnt_rxcui2,
+        U.REL,
+        U.REL_STR
 from    all_rxcui_str.RXNCONSO_curated_rela A,
-        opioid.all_keywords_DIFF_bioportal D,
+        opioid.all_keywords_DIFF_bioportal  D,
         umls_rel U
 where   A.rel=U.rel and A.RXCUI2 = D.RXCUI
 group by U.REL,U.REL_STR
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
---    +-----+--------------------------------------------------------------+------------+------------+
---    | REL | REL_STR                                                      | cnt_rxcui1 | cnt_rxcui2 |
---    +-----+--------------------------------------------------------------+------------+------------+
---    | RO  | has relationship other than synonymous, narrower, or broader |       8805 |       5850 |
---    | RB  | has a broader relationship                                   |       6908 |       3991 |
---    | RN  | has a narrower relationship                                  |       5654 |       6286 |
---    +-----+--------------------------------------------------------------+------------+------------+
+--    +------------+------------+-----+--------------------------------------------------------------+
+--    | cnt_rxcui1 | cnt_rxcui2 | REL | REL_STR                                                      |
+--    +------------+------------+-----+--------------------------------------------------------------+
+--    |       7436 |       5727 | RO  | has relationship other than synonymous, narrower, or broader |
+--    |       6701 |       3918 | RB  | has a broader relationship                                   |
+--    |       5531 |       6179 | RN  | has a narrower relationship                                  |
+--    +------------+------------+-----+--------------------------------------------------------------+
 
 -- ####
 -- REL Attributes
 
 drop    table if exists opioid.RXNCONSO_curated_rela__all_keywords_DIFF_bioportal;
-create  table opioid.RXNCONSO_curated_rela__all_keywords_DIFF_bioportal
-select  distinct A.REL, A.RELA, A.RXCUI, A.RXCUI2, A.STR
+create  table           opioid.RXNCONSO_curated_rela__all_keywords_DIFF_bioportal
+select  distinct        A.REL, A.RELA, A.RXCUI, A.RXCUI2, A.STR
 from    all_rxcui_str.RXNCONSO_curated_rela A,
-        opioid.all_keywords_DIFF_bioportal D
+        opioid.all_keywords_DIFF_bioportal  D
 where   A.RXCUI2 = D.RXCUI;
 
--- 160265 rows in set
+-- 155462 rows in set
+
+select  RELA,
+        count(distinct RXCUI) as cnt_rxcui1,
+        count(distinct RXCUI2) as cnt_rxcui2
+from    opioid.RXNCONSO_curated_rela__all_keywords_DIFF_bioportal
+group by RELA
+order by cnt_rxcui1 desc, cnt_rxcui2 desc;
+
+--    +------------------------+------------+------------+
+--    | RELA                   | cnt_rxcui1 | cnt_rxcui2 |
+--    +------------------------+------------+------------+
+--    | ingredient_of          |       4198 |        438 |
+--    | isa                    |       4185 |       3102 |
+--    | has_tradename          |       3952 |       1184 |
+--    | inverse_isa            |       3136 |       3180 |
+--    | tradename_of           |       1712 |       4295 |
+--    | consists_of            |       1662 |       1973 |
+--    | form_of                |       1384 |       1451 |
+--    | constitutes            |       1287 |       1051 |
+--    | has_form               |       1013 |        976 |
+--    | precise_ingredient_of  |        986 |         39 |
+--    | has_ingredient         |        734 |       3837 |
+--    | ingredients_of         |        616 |        172 |
+--    | has_quantified_form    |        363 |        299 |
+--    | boss_of                |        287 |         29 |
+--    | has_ingredients        |        182 |        491 |
+--    | part_of                |        174 |         20 |
+--    | quantified_form_of     |        156 |        193 |
+--    | has_boss               |         89 |        287 |
+--    | has_part               |         80 |        172 |
+--    | has_precise_ingredient |         62 |        504 |
+--    | has_dose_form          |         27 |       2820 |
+--    | has_doseformgroup      |         14 |        933 |
+--    | contains               |         13 |          5 |
+--    | reformulated_to        |          7 |          7 |
+--    | reformulation_of       |          7 |          7 |
+--    | contained_in           |          4 |         11 |
+--    +------------------------+------------+------------+
 
 select  REL, RELA,
         count(distinct RXCUI) as cnt_rxcui1,
@@ -208,30 +224,30 @@ order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 --    +------+------------------------+------------+------------+
 --    | REL  | RELA                   | cnt_rxcui1 | cnt_rxcui2 |
 --    +------+------------------------+------------+------------+
---    | RO   | ingredient_of          |       5465 |        478 |
---    | RN   | isa                    |       4261 |       3145 |
---    | RB   | has_tradename          |       4100 |       1211 |
---    | RB   | inverse_isa            |       3164 |       3223 |
---    | RN   | tradename_of           |       1757 |       4383 |
---    | RO   | consists_of            |       1690 |       2008 |
---    | RN   | form_of                |       1390 |       1457 |
---    | RO   | constitutes            |       1296 |       1060 |
---    | RB   | has_form               |       1046 |        999 |
---    | RO   | has_ingredient         |        745 |       3903 |
+--    | RO   | ingredient_of          |       4198 |        438 |
+--    | RN   | isa                    |       4185 |       3102 |
+--    | RB   | has_tradename          |       3952 |       1184 |
+--    | RB   | inverse_isa            |       3136 |       3180 |
+--    | RN   | tradename_of           |       1712 |       4295 |
+--    | RO   | consists_of            |       1662 |       1973 |
+--    | RN   | form_of                |       1384 |       1451 |
+--    | RO   | constitutes            |       1287 |       1051 |
+--    | RB   | has_form               |       1013 |        976 |
+--    | RO   | has_ingredient         |        734 |       3837 |
 --    | RB   | precise_ingredient_of  |        677 |         38 |
 --    | RO   | ingredients_of         |        616 |        172 |
---    | RB   | has_quantified_form    |        364 |        300 |
---    | RO   | part_of                |        322 |         31 |
+--    | RB   | has_quantified_form    |        363 |        299 |
 --    | RO   | precise_ingredient_of  |        309 |         26 |
---    | RO   | boss_of                |        289 |         32 |
---    | RO   | has_ingredients        |        189 |        503 |
---    | RN   | quantified_form_of     |        159 |        196 |
+--    | RO   | boss_of                |        287 |         29 |
+--    | RO   | has_ingredients        |        182 |        491 |
+--    | RO   | part_of                |        174 |         20 |
+--    | RN   | quantified_form_of     |        156 |        193 |
 --    | RO   | has_boss               |         89 |        287 |
 --    | RO   | has_part               |         80 |        172 |
---    | RN   | has_precise_ingredient |         60 |        400 |
---    | RO   | has_dose_form          |         28 |       2863 |
+--    | RN   | has_precise_ingredient |         59 |        385 |
+--    | RO   | has_dose_form          |         27 |       2820 |
 --    | RO   | has_precise_ingredient |         23 |        119 |
---    | RO   | has_doseformgroup      |         14 |        964 |
+--    | RO   | has_doseformgroup      |         14 |        933 |
 --    | RN   | contains               |         13 |          5 |
 --    | RO   | reformulated_to        |          7 |          7 |
 --    | RO   | reformulation_of       |          7 |          7 |

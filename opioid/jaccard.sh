@@ -9,7 +9,6 @@ $mysql_dataset < jaccard_self.sql
 ####################################################
 $mysql_dataset < jaccard_vsac_math.sql
 #
-./export_tsv.sh bioportal_AND_vsac_math
 ./export_tsv.sh bioportal_DIFF_vsac_math
 ./export_tsv.sh vsac_math_SUB_bioportal
 ####################################################
