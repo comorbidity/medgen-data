@@ -1,0 +1,18 @@
+348	348	SCD	Semantic Clinical Drug
+347	347	PSN	Prescribable Names
+419	329	CDA	Clinical drug name in abbreviated format
+419	329	CDC	Clinical drug name in concatenated format (NDDF)
+419	329	CDD	Clinical drug name in delimited format
+1126	311	CD	Clinical Drug
+408	288	SY	Designated synonym
+341	263	AB	Abbreviation in any source vocabulary
+548	220	DP	Drug Product
+433	211	BD	Fully-specified drug brand name that can be prescribed
+389	193	TMSY	Tall Man synonym
+126	122	FN	Full form of descriptor
+126	122	PT	Designated preferred name
+148	57	MTH_RXN_CD	RxNorm Created CD
+42	39	MTH_RXN_BD	RxNorm Created BD
+75	26	MTH_RXN_DP	RxNorm Created DP
+19	19	MTH_RXN_CDC	RxNorm Created CDC
+2	2	GPCK	Generic Drug Delivery Device

@@ -1,0 +1,45 @@
+102442	62070	SY	Designated synonym
+113201	51376	BD	Fully-specified drug brand name that can be prescribed
+82088	50711	CD	Clinical Drug
+98866	43278	DP	Drug Product
+46898	42467	PT	Designated preferred name
+44899	40611	FN	Full form of descriptor
+38677	38677	SCD	Semantic Clinical Drug
+65976	36492	IN	Name for an ingredient
+36241	36241	PSN	Prescribable Names
+35740	32230	CDA	Clinical drug name in abbreviated format
+35742	32230	CDC	Clinical drug name in concatenated format (NDDF)
+35756	32230	CDD	Clinical drug name in delimited format
+36232	28291	BN	Fully-specified drug brand name that can not be prescribed
+27628	27628	SCDC	Semantic Drug Component
+29547	26954	AB	Abbreviation in any source vocabulary
+22930	22930	SBD	Semantic branded drug
+26708	22345	TMSY	Tall Man synonym
+19644	19644	SBDG	Semantic branded drug group
+18769	18769	SBDC	Semantic Branded Drug Component
+16120	16120	SCDG	Semantic clinical drug group
+14840	14840	SCDF	Semantic clinical drug and form
+14955	14543	MS	Multum names of branded and generic supplies or supplements
+15444	14317	SU	Active Substance
+14131	14131	SBDF	Semantic branded drug and form
+4922	4922	SBDFP	Semantic branded drug and form w/ precise ingredient as basis strength
+4626	4626	SCDGP	Semantic clinical drug group w/ precise ingredient as basis strength
+4296	4296	SCDFP	Semantic clinical drug and form w/ precise ingredient as basis strength
+4067	4053	GN	Generic drug name
+3800	3800	MIN	name for a multi-ingredient
+3457	3457	PIN	Name from a precise ingredient
+4366	2018	FSY	Foreign Synonym
+2136	1270	MTH_RXN_BD	RxNorm Created BD
+1020	1002	PTGB	British preferred term
+956	945	RXN_PT	Rxnorm Preferred
+1034	929	DF	Dose Form
+921	921	BPCK	Branded Drug Delivery Device
+1916	911	MTH_RXN_CD	RxNorm Created CD
+832	832	GPCK	Generic Drug Delivery Device
+1513	818	MTH_RXN_DP	RxNorm Created DP
+731	556	SYGB	British synonym
+399	380	MTH_RXN_CDC	RxNorm Created CDC
+61	61	RXN_IN	Rxnorm Preferred Ingredient
+46	46	DFG	Dose Form Group
+23	23	SC	Special Category term
+11	8	ET	Entry term
