@@ -86,7 +86,21 @@ group by RELA
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
 -- ############################################## (expand)
--- REL Attributes TTY TermTypes
+-- RELA Attributes TTY TermTypes
+drop    table if exists stats_expand_rel_tty;
+create  table           stats_expand_rel_tty as
+select  count(*) as cnt_star,
+        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI2)  as cnt_rxcui2,
+        REL,
+        TTY,
+        TTY2
+from    expand E
+group by REL, TTY, TTY2
+order by cnt_rxcui1 desc, cnt_rxcui2 desc;
+
+-- ############################################## (expand)
+-- RELA Attributes TTY TermTypes
 drop    table if exists stats_expand_rela_tty;
 create  table           stats_expand_rela_tty as
 select  count(*) as cnt_star,
@@ -97,6 +111,22 @@ select  count(*) as cnt_star,
         TTY2
 from    expand E
 group by RELA, TTY, TTY2
+order by cnt_rxcui1 desc, cnt_rxcui2 desc;
+
+
+-- ############################################## (expand)
+-- RELA Attributes TTY TermTypes
+drop    table if exists stats_expand_rel_rela_tty;
+create  table           stats_expand_rel_rela_tty as
+select  count(*) as cnt_star,
+        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI2)  as cnt_rxcui2,
+        REL,
+        RELA,
+        TTY,
+        TTY2
+from    expand E
+group by REL, RELA, TTY, TTY2
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
 -- ##############################################
