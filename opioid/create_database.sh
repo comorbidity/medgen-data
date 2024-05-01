@@ -11,6 +11,7 @@ $mysql_table_schema < create_procedures.sql
 $mysql_table_schema < version.sql
 $mysql_table_schema < UMLS_abbreviations.sql
 $mysql_table_schema < keywords.sql
+$mysql_table_schema < expand_rules.sql
 echo '#############################################'
 $mysql_table_schema -e "call mem"
 echo '#############################################'
