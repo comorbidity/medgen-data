@@ -1,69 +1,95 @@
 -- ##############################################
 call log('MEDRT.sql', 'begin');
 
---    MRREL not in MED-RT
+drop table if exists    MRCONSO_medrt;
+
+drop table if exists    MRREL_medrt_cui1,
+                        MRREL_medrt_cui2,
+                        MRREL_medrt_cui3,
+                        MRREL_medrt_cui4,
+                        MRREL_medrt_cui5,
+                        MRREL_medrt_cui6;
+
+drop table if exists    curated_cui,
+                        curated_cui_stat,
+                        curated_cui_stat_sab,
+                        curated_cui_stat_sab_tty,
+                        curated_cui_stat_rel,
+                        curated_cui_stat_rela,
+                        curated_cui_stat_rel_rela;
+
+--    drop    table if exists MRREL_medrt;
+--    create  table           MRREL_medrt
+--    select  *
+--    from    umls.MRREL
+--    where   REL = 'CHD'
+--    OR      RELA in ('isa',
+--            'tradename_of','has_tradename',
+--            'has_basis_of_strength_substance');
+
+-- delete from MRREL_medrt where REL in ('RB', 'PAR');
+
+--    not in MED-RT
 --    C0376196|Opiates
 --    C0242402|Opioids
 
 -- TODO: X guard against X
 -- C0027410|Narcotic Antagonists
+-- C2917434|Narcotic Antitussive
+-- C2916808|NMDA Receptor Antagonists
 
-drop    table if exists opioid.MRCONSO_medrt;
-create  table           opioid.MRCONSO_medrt
+drop    table if exists MRCONSO_medrt;
+create  table           MRCONSO_medrt
 select  *
 from    umls.MRCONSO
-where   CUI in ('C0376196', 'C0242402') OR (
+where   TRUE and
+--        CUI in ('C0376196', 'C0242402') OR (
         SAB in ('MED-RT') AND
                 (lower(STR) like '%opioid%' OR
-                 lower(STR) like '%opiate%'))
+                 lower(STR) like '%opiate%')
 order by STR,TTY;
+
+call create_index('MRCONSO_medrt', 'CUI');
 
 -- ############################################################################
 -- MRREL_medrt_cui1
 -- ############################################################################
 
--- relate
-drop    table if exists opioid.MRREL_medrt_cui1;
-create  table           opioid.MRREL_medrt_cui1
+drop    table if exists MRREL_medrt_cui1;
+create  table           MRREL_medrt_cui1
 select  distinct
         R.CUI1,
-        R.AUI1,
-        R.STYPE1,
-        R.CUI2,
-        R.AUI2,
-        R.STYPE2,
-        R.SAB,
         R.REL,
         R.RELA,
+        R.CUI2,
+        R.SAB,
         C.TTY   as TTY,
         C.CODE  as CODE,
         C.STR   as STR
-from    opioid.MRREL_copy R, opioid.MRCONSO_medrt C
+from    MRREL_medrt R, MRCONSO_medrt C
 where   R.CUI1 = C.CUI;
 
-delete from MRREL_medrt_cui1 where REL in ('PAR', 'RB');
+call create_index('MRREL_medrt_cui1', 'CUI1');
+call create_index('MRREL_medrt_cui1', 'CUI2');
 
--- include
-drop    table if exists opioid.include;
-create  table           opioid.include
-select  distinct
-        'CUI1' as tier, CUI1  as CUI,
-        SAB, CODE, TTY, STR
-from    MRREL_medrt_cui1;
+drop    table if exists curated_cui;
+create  table           curated_cui
+select  distinct 'CUI1' as tier, CUI1  as CUI, R.*
+from    MRREL_medrt_cui1 R;
 
-call create_index('opioid.include', 'CUI');
-call create_index('opioid.include', 'SAB,CODE');
+call create_index('curated_cui', 'CUI');
+call create_index('curated_cui', 'SAB,CODE');
 
 -- count
 select SAB, count(*) cnt from MRREL_medrt_cui1 group by SAB order by CNT desc;
 
---    select  count(distinct CUI1) as cnt_cui1,
---            count(distinct CUI2) as cnt_cui2,
---            REL,RELA
---    from    opioid.MRREL_medrt_cui1
---    where   CUI1 != CUI2
---    group by REL,RELA
---    order by cnt_cui2 desc, cnt_cui1 desc;
+select  count(distinct CUI1) as cnt_cui1,
+        count(distinct CUI2) as cnt_cui2,
+        REL, RELA, TTY
+from    MRREL_medrt_cui1
+where   CUI1 != CUI2
+group by REL,RELA, TTY
+order by cnt_cui2 desc, cnt_cui1 desc;
 
 --    +----------+----------+-----+----------------------------------------+
 --    | cnt_cui1 | cnt_cui2 | REL | RELA                                   |
@@ -98,378 +124,284 @@ select SAB, count(*) cnt from MRREL_medrt_cui1 group by SAB order by CNT desc;
 -- MRREL_medrt_cui2
 -- ############################################################################
 
--- relate
-drop    table if exists opioid.MRREL_medrt_cui2;
-create  table           opioid.MRREL_medrt_cui2
+drop    table if exists MRREL_medrt_cui2;
+create  table           MRREL_medrt_cui2
 select  distinct
-        R.CUI1, R.AUI1, R.STYPE1, R.REL, R.RELA, R.CUI2, R.AUI2, R.STYPE2, D.SAB, D.CODE, D.TTY, D.STR
-from    opioid.MRREL_medrt_cui1 as R,
-        opioid.MRCONSO_drug     as D
+        R.CUI1, R.REL, R.RELA, R.CUI2, D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt_cui1 as R,
+        MRCONSO_drug     as D
 where   R.CUI2 = D.CUI
-and     R.CUI2 not in (select distinct CUI from opioid.include);
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
--- include
-drop    table if exists opioid.MRREL_medrt_cui2_include;
-create  table           opioid.MRREL_medrt_cui2_include
-select  *
-from    MRREL_medrt_cui2
-where   REL = 'CHD'
-OR     (REL = 'RN' and RELA='ISA')
-OR     (RELA in ('has_mechanism_of_action', 'mechanism_of_action_of'));
+call create_index('MRREL_medrt_cui2', 'CUI1');
+call create_index('MRREL_medrt_cui2', 'CUI2');
 
-insert  into    opioid.include
-select  distinct
-        'CUI2' as tier, CUI2  as CUI,
-        SAB, CODE, TTY, STR
-from    MRREL_medrt_cui2_include;
-
--- count
-select  count(distinct CUI1) as cnt_cui1,
-        count(distinct CUI2) as cnt_cui2,
-        REL, RELA, SAB, TTY
-from    opioid.MRREL_medrt_cui2_include
-group by REL, RELA, SAB, TTY
-order by cnt_cui2 desc, cnt_cui1 desc;
-
---    +----------+----------+-----+-------------------------+
---    | cnt_cui1 | cnt_cui2 | REL | RELA                    |
---    +----------+----------+-----+-------------------------+
---    |        2 |      107 | CHD | isa                     |
---    |        8 |       93 | RO  | has_mechanism_of_action |
---    |        3 |       56 | CHD | NULL                    |
---    |        9 |       33 | CHD | has_parent              |
---    |        1 |        4 | RN  | isa                     |
---    +----------+----------+-----+-------------------------+
-
+insert  into    curated_cui
+select  distinct 'CUI2' as tier, CUI2  as CUI, R.*
+from    MRREL_medrt_cui2 R;
 
 -- ############################################################################
 -- MRREL_medrt_cui3
 -- ############################################################################
 
--- relate
-drop    table if exists opioid.MRREL_medrt_cui3;
-create  table           opioid.MRREL_medrt_cui3
+drop    table if exists MRREL_medrt_cui3;
+create  table           MRREL_medrt_cui3
 select  distinct
         R.CUI1   as CUI2,
-        R.AUI1   as AUI2,
-        R.STYPE1 as STYPE2,
         R.REL,
         R.RELA,
         R.CUI2   as CUI3,
-        R.AUI2   as AUI3,
-        R.STYPE2 as STYPE3,
         D.SAB, D.CODE, D.TTY, D.STR
-from    opioid.MRREL_copy           as R,
-        MRREL_medrt_cui2_include    as I,
-        opioid.MRCONSO_drug         as D
-where   R.CUI1!= R.CUI2
-and     R.CUI1 = I.CUI2
+from    MRREL_medrt         as R,
+        MRREL_medrt_cui2    as I,
+        MRCONSO_drug        as D
+where   R.CUI1 = I.CUI2
 and     R.CUI2 = D.CUI
-and     R.CUI2 not in (select distinct CUI from opioid.include);
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
--- include
-drop    table if exists opioid.MRREL_medrt_cui3_include;
-create  table           opioid.MRREL_medrt_cui3_include
-select  *
-from    MRREL_medrt_cui3
-where   REL = 'CHD'
-OR     (REL = 'RN' and RELA='ISA')
-OR     (RELA in ('tradename_of'));
+call create_index('MRREL_medrt_cui3', 'CUI2');
+call create_index('MRREL_medrt_cui3', 'CUI3');
 
-insert  into    opioid.include
-select  distinct
-        'CUI3' as tier, CUI3  as CUI,
-        SAB, CODE, TTY, STR
-from    MRREL_medrt_cui3_include;
-
-select * from include I1, include I2 where I1.CUI=I2.CUI and I1.tier != I2.tier;
-
--- count
-select  count(distinct CUI2) as cnt_cui2,
-        count(distinct CUI3) as cnt_cui3,
-        REL, RELA, SAB
-from    opioid.MRREL_medrt_cui3_include
-group by REL, RELA, SAB
-order by cnt_cui3 desc, cnt_cui2 desc;
+insert  into    curated_cui
+select  distinct 'CUI3' as tier, CUI3  as CUI, R.*
+from    MRREL_medrt_cui3 R;
 
 -- ############################################################################
 -- MRREL_medrt_cui4
 -- ############################################################################
 
 -- relate
-drop    table if exists opioid.MRREL_medrt_cui4;
-create  table           opioid.MRREL_medrt_cui4
+drop    table if exists MRREL_medrt_cui4;
+create  table           MRREL_medrt_cui4
 select  distinct
         R.CUI1   as CUI3,
-        R.AUI1   as AUI3,
-        R.STYPE1 as STYPE3,
         R.REL,
         R.RELA,
         R.CUI2   as CUI4,
-        R.AUI2   as AUI4,
-        R.STYPE2 as STYPE4,
         D.SAB, D.CODE, D.TTY, D.STR
-from    opioid.MRREL_copy           as R,
-        MRREL_medrt_cui3_include    as I,
-        opioid.MRCONSO_drug         as D
-where   R.CUI1 = I.CUI2
+from    MRREL_medrt         as R,
+        MRREL_medrt_cui3    as I,
+        MRCONSO_drug        as D
+where   R.CUI1 = I.CUI3
 and     R.CUI2 = D.CUI
-and     R.CUI2 not in (select distinct CUI from include);
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
--- include
-drop    table if exists opioid.MRREL_medrt_cui4_include;
-create  table           opioid.MRREL_medrt_cui4_include
-select  *
-from    MRREL_medrt_cui4
-where   REL = 'CHD'
-OR     (REL = 'RN' and RELA='ISA')
-OR     (RELA in ('tradename_of',
-                'basis_of_strength_substance_of',
-                'has_basis_of_strength_substance'));
+call create_index('MRREL_medrt_cui4', 'CUI3');
+call create_index('MRREL_medrt_cui4', 'CUI4');
 
-insert  into    opioid.include
+insert  into    curated_cui
+select  distinct 'CUI4' as tier, CUI4  as CUI, R.*
+from    MRREL_medrt_cui4 R;
+
+-- ############################################################################
+-- MRREL_medrt_cui5
+-- ############################################################################
+
+drop    table if exists MRREL_medrt_cui5;
+create  table           MRREL_medrt_cui5
 select  distinct
-        'CUI4' as tier, CUI4  as CUI,
-        SAB, CODE, TTY, STR
-from    MRREL_medrt_cui4_include;
+        R.CUI1   as CUI4,
+        R.REL,
+        R.RELA,
+        R.CUI2   as CUI5,
+        D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt          as R,
+        MRREL_medrt_cui4     as I,
+        MRCONSO_drug         as D
+where   R.CUI1 = I.CUI4
+and     R.CUI2 = D.CUI
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
--- count
-select  count(distinct CUI3) as cnt_cui3,
-        count(distinct CUI4) as cnt_cui4,
-        REL
-from    opioid.MRREL_medrt_cui4
-group by REL
-order by cnt_cui4 desc, cnt_cui3 desc;
+insert  into    curated_cui
+select  distinct 'CUI5' as tier, CUI5  as CUI, R.*
+from    MRREL_medrt_cui5 R;
 
---    +----------+----------+-----+
---    | cnt_cui3 | cnt_cui4 | REL |
---    +----------+----------+-----+
---    |       84 |     3200 | RO  |
---    |       45 |      764 | RN  |
---    |       83 |       98 | PAR |
---    |       44 |       27 | RB  |
---    |        9 |       12 | RQ  |
---    |        1 |        1 | SY  |
---    +----------+----------+-----+
+select tier, count(*), count(distinct CUI) from curated_cui group by tier order by tier;
 
-select  count(distinct CUI3) as cnt_cui3,
-        count(distinct CUI4) as cnt_cui4,
-        REL, RELA, SAB, TTY
-from    opioid.MRREL_medrt_cui4_include
-group by REL, RELA, SAB, TTY
-order by cnt_cui4 desc, cnt_cui3 desc;
+call create_index('MRREL_medrt_cui5', 'CUI4');
+call create_index('MRREL_medrt_cui5', 'CUI5');
 
 -- ############################################################################
---
+-- MRREL_medrt_cui6
 -- ############################################################################
 
+drop    table if exists MRREL_medrt_cui6;
+create  table           MRREL_medrt_cui6
+select  distinct
+        R.CUI1   as CUI5,
+        R.REL,
+        R.RELA,
+        R.CUI2   as CUI6,
+        D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt          as R,
+        MRREL_medrt_cui5     as I,
+        MRCONSO_drug         as D
+where   R.CUI1 = I.CUI5
+and     R.CUI2 = D.CUI
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
---drop    table if exists opioid.MRREL_medrt_cui1_stats;
---create  table           opioid.MRREL_medrt_cui1_stats
---select  count(distinct CUI1) as cnt_cui1,
---        count(distinct CUI2) as cnt_cui2,
---        REL, RELA, SAB
---from    opioid.MRREL_medrt_cui1
---where   CUI1 != CUI2
---and     CUI2 not in (select distinct CUI1 from opioid.MRREL_medrt_cui1)
---group by REL, RELA, SAB
---order by cnt_cui1 desc, cnt_cui2 desc;
---
---select * from MRREL_medrt_cui1_stats where SAB='MED-RT';
---    +----------+----------+-----+----------------------------------------+--------+
---    | cnt_cui1 | cnt_cui2 | REL | RELA                                   | SAB    |
---    +----------+----------+-----+----------------------------------------+--------+
---    |        9 |       33 | CHD | has_parent                             | MED-RT | include
---    |        8 |       93 | RO  | has_mechanism_of_action                | MED-RT | include
---    |        6 |        5 | PAR | NULL                                   | MED-RT | X
---    |        3 |        3 | SY  | NULL                                   | MED-RT | risky
---    |        2 |        2 | PAR | parent_of                              | MED-RT | X
---    |        1 |        4 | RO  | contraindicated_class_of               | MED-RT | X
---    |        1 |        2 | RO  | contraindicated_mechanism_of_action_of | MED-RT | X
---    +----------+----------+-----+----------------------------------------+--------+
+insert  into    curated_cui
+select  distinct 'CUI6' as tier, CUI6  as CUI, R.*
+from    MRREL_medrt_cui6 R;
 
---drop    table if exists opioid.MRREL_medrt_cui2_stats;
---create  table           opioid.MRREL_medrt_cui2_stats
---select  count(distinct CUI1) as cnt_cui1,
---        count(distinct CUI2) as cnt_cui2,
---        REL, RELA, SAB, TTY
---from    opioid.MRREL_medrt_cui2
---group by REL, RELA, SAB, TTY
---order by cnt_cui1 desc, cnt_cui2 desc;
+call create_index('MRREL_medrt_cui6', 'CUI5');
+call create_index('MRREL_medrt_cui6', 'CUI6');
 
---    select  count(distinct CUI1) as cnt_cui1,
---            count(distinct CUI2) as cnt_cui2,
---            REL
---    from    opioid.MRREL_medrt_cui2
---    group by REL
---    order by cnt_cui1 desc, cnt_cui2 desc;
---
---    drop    table if exists opioid.MRREL_medrt_cui2_include;
---    create  table           opioid.MRREL_medrt_cui2_include
---    select  *
---    from    MRREL_medrt_cui2
---    where   REL = 'CHD'
---    OR     (REL = 'RN' and RELA='ISA')
---    OR     (RELA in ('has_mechanism_of_action', 'mechanism_of_action_of'));
+-- ############################################################################
+-- MRREL_medrt_cui7
+-- ############################################################################
 
+drop    table if exists MRREL_medrt_cui7;
+create  table           MRREL_medrt_cui7
+select  distinct
+        R.CUI1   as CUI6,
+        R.REL,
+        R.RELA,
+        R.CUI2   as CUI7,
+        D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt          as R,
+        MRREL_medrt_cui6     as I,
+        MRCONSO_drug         as D
+where   R.CUI1 = I.CUI6
+and     R.CUI2 = D.CUI
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
+insert  into    curated_cui
+select  distinct 'CUI7' as tier, CUI7  as CUI, R.*
+from    MRREL_medrt_cui7 R;
 
---    +----------+----------+-----+----------------------------------------+
---    | cnt_cui1 | cnt_cui2 | REL | RELA                                   |
---    +----------+----------+-----+----------------------------------------+
---    |        9 |       33 | CHD | has_parent                             | +include
---    |        8 |       93 | RO  | has_mechanism_of_action                | +include
---    |        4 |       11 | RO  | NULL                                   |
---    |        3 |       56 | CHD | NULL                                   | +include
---    |        3 |        3 | SY  | NULL                                   |
---    |        2 |      107 | CHD | isa                                    | +include
---    |        2 |        9 | RN  | NULL                                   |
---    |        2 |        2 | RQ  | NULL                                   |
---    |        1 |       44 | RO  | has_causative_agent                    | X (Opioid abuse (disorder))
---    |        1 |       11 | RO  | has_component                          | X (Opioid screening)
---    |        1 |        4 | RN  | isa                                    | +include
---    |        1 |        4 | RO  | contraindicated_class_of               | X
---    |        1 |        2 | RO  | contraindicated_mechanism_of_action_of | X
---    |        1 |        2 | RO  | has_direct_substance                   | X (Opioid therapy for breathlessness management)
---    |        1 |        1 | RO  | associated_with                        | X (Opiate misuse (finding))
---    |        1 |        1 | RO  | disposition_of                         | X (not a drug)
---    |        1 |        1 | RO  | measures                               | X (Urine opiate measurement (procedure))
---    |        1 |        1 | RQ  | use                                    | X
---    +----------+----------+-----+----------------------------------------+
+call create_index('MRREL_medrt_cui7', 'CUI6');
+call create_index('MRREL_medrt_cui7', 'CUI7');
 
---    --select * from MRREL_medrt_cui2_stats;
---
---    drop    table if exists opioid.MRREL_medrt_cui2_moa;
---    create  table           opioid.MRREL_medrt_cui2_moa
---    select  *
---    from    MRREL_medrt_cui2
---    where   RELA in ('has_mechanism_of_action', 'mechanism_of_action_of');
---
---    drop    table if exists opioid.MRREL_medrt_cui2_child;
---    create  table           opioid.MRREL_medrt_cui2_child
---    select  *
---    from    MRREL_medrt_cui2
---    where   REL in ('CHD', 'RN') or RELA in ('has_parent', 'isa');
---
---    select distinct RELA,SAB,TTY from MRREL_medrt_cui2_child order by RELA,SAB,TTY;
---
---    drop    table if exists opioid.MRREL_medrt_cui2_include;
---    create  table           opioid.MRREL_medrt_cui2_include
---    select  * from MRREL_medrt_cui2_moa
---    UNION
---    select  * from MRREL_medrt_cui2_child;
---
---    call create_index ('MRREL_medrt_cui2_include', 'CUI1');
---    call create_index ('MRREL_medrt_cui2_include', 'CUI2');
---    call create_index ('MRREL_medrt_cui2_include', 'REL');
---    call create_index ('MRREL_medrt_cui2_include', 'RELA');
---
---    drop    table if exists opioid.MRREL_medrt_cui3;
---    create  table           opioid.MRREL_medrt_cui3
---    select  distinct
---            R.CUI1   as CUI2,
---            R.AUI1   as AUI2,
---            R.STYPE1 as STYPE2,
---            R.REL,
---            R.RELA,
---            R.CUI2   as CUI3,
---            R.AUI2   as AUI3,
---            R.STYPE2 as STYPE3,
---            D.SAB, D.TTY, D.STR
---    from    opioid.MRREL_copy           as R,
---            MRREL_medrt_cui2_include    as I,
---            opioid.MRCONSO_drug         as D
---    where   R.CUI1 = I.CUI2
---    and     R.CUI2 = D.CUI
---    and     R.CUI1 not in (select distinct CUI1 from MRREL_medrt_cui2_include);
---
---    delete from MRREL_medrt_cui3 where REL in ('PAR', 'RB');
---
---    select  count(distinct CUI2) as cnt_cui2,
---            count(distinct CUI3) as cnt_cui3,
---            REL, RELA
---    from    opioid.MRREL_medrt_cui3
---    group by REL, RELA
---    order by cnt_cui3 desc, cnt_cui2 desc;
+-- ############################################################################
+-- MRREL_medrt_cui8
+-- ############################################################################
 
---    +----------+----------+-----+--------------------------------------------+
---    | cnt_cui2 | cnt_cui3 | REL | RELA                                       |
---    +----------+----------+-----+--------------------------------------------+
---    |       81 |     1728 | RO  | has_ingredient                             |
---    |       95 |     1293 | RO  | has_active_ingredient                      |
---    |       79 |      899 | RN  | NULL                                       | ?
---    |       36 |      539 | RO  | has_active_moiety                          |
---    |       30 |      381 | RO  | has_boss                                   |
---    |       48 |      360 | RO  | has_precise_active_ingredient              | +include TTY=IN
---    |       46 |      360 | RO  | has_basis_of_strength_substance            | +include has_basis_of_strength_substance
---    |       63 |      306 | RO  | NULL                                       |
---    |       25 |      249 | RO  | has_precise_ingredient                     |
---    |       63 |      246 | CHD | isa                                        | +include child
---    |       28 |      204 | RO  | has_part                                   | +include child
---    |       32 |      200 | RO  | has_causative_agent                        |
---    |       43 |      145 | RN  | tradename_of                               | +include
---    |       38 |      136 | RN  | has_precise_ingredient                     |
---    |       34 |      128 | CHD | NULL                                       |
---    |      117 |      119 | SY  | NULL                                       |
---    |       19 |      111 | RO  | contains                                   |
---    |       92 |       87 | RO  | active_ingredient_of                       | +include
---    |       50 |       70 | RO  | is_modification_of                         |
---    |       40 |       70 | RO  | has_component                              |
---    |       47 |       69 | RN  | form_of                                    | +include
---    |       40 |       69 | RN  | isa                                        | +include
---    |       21 |       62 | RN  | mapped_to                                  |
---    |       42 |       54 | RO  | associated_with                            |
---    |       41 |       49 | RO  | has_free_acid_or_base_form                 |
---    |       32 |       48 | SY  | tradename_of                               |
---    |       55 |       42 | RO  | has_modification                           |
---    |       39 |       39 | SY  | transliterated_form_of                     |
---    |       39 |       39 | SY  | translation_of                             |
---    |       39 |       39 | SY  | has_transliterated_form                    |
---    |       39 |       39 | SY  | has_translation                            |
---    |       44 |       37 | RO  | has_salt_form                              |
---    |       91 |       35 | RO  | has_contraindicated_drug                   |
---    |       87 |       26 | RO  | may_be_treated_by                          |
---    |       93 |       25 | RO  | physiologic_effect_of                      |
---    |       17 |       25 | RQ  | NULL                                       |
---    |       19 |       19 | SY  | permuted_term_of                           |
---    |       19 |       19 | SY  | has_permuted_term                          |
---    |       16 |       16 | RQ  | mapped_to                                  |
---    |       15 |       16 | RQ  | mapped_from                                |
---    |       96 |       15 | RO  | mechanism_of_action_of                     |
---    |        3 |       12 | RO  | contraindicated_class_of                   |
---    |       94 |       11 | RO  | therapeutic_class_of                       |
+drop    table if exists MRREL_medrt_cui8;
+create  table           MRREL_medrt_cui8
+select  distinct
+        R.CUI1   as CUI7,
+        R.REL,
+        R.RELA,
+        R.CUI2   as CUI8,
+        D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt          as R,
+        MRREL_medrt_cui7     as I,
+        MRCONSO_drug         as D
+where   R.CUI1 = I.CUI7
+and     R.CUI2 = D.CUI
+and     R.CUI2 not in (select distinct CUI from curated_cui);
 
+insert  into    curated_cui
+select  distinct 'CUI8' as tier, CUI8  as CUI, R.*
+from    MRREL_medrt_cui8 R;
 
+call create_index('MRREL_medrt_cui8', 'CUI7');
+call create_index('MRREL_medrt_cui8', 'CUI8');
 
+-- ############################################################################
+-- MRREL_medrt_cui9
+-- ############################################################################
 
---CUI|STR
---C0242402|Opioids
---C0376196|Opiates
---C1883695|Opioid Agonist [EPC]
---C1373059|Opioid Agonists [Function]
---C2917221|Full Opioid Agonists [MoA]
---C3536879|Opioid Antagonist [EPC]
---C3537237|Opioid Analgesic [EPC]
---C1373041|Opioid Receptor Interactions [MoA]
---C4060037|mu-Opioid Receptor Agonist [EPC]
---C4060041|Opioid mu-Receptor Agonists [Function]
---
---Opioid Agonist/Antagonist [EPC]	N0000175692	MED-RT
---Opioid Agonist [EPC]	N0000175690	MED-RT
---Opioid Analgesic [EPC]	N0000175440	MED-RT
---Opioid Receptor Interactions [MoA]	N0000000200	MED-RT
---Kappa Opioid Receptor Agonist [EPC]	N0000194001	MED-RT
---Opioid Antagonist [EPC]	N0000175691	MED-RT
---Full Opioid Agonists [MoA]	N0000175684	MED-RT
---Opioid Agonists [MoA]	N0000000174	MED-RT
---Opioid Antagonists [MoA]	N0000000154	MED-RT
---Partial Opioid Agonists [MoA]	N0000175685	MED-RT
---Competitive Opioid Antagonists [MoA]	N0000175686	MED-RT
---Opioid mu-Receptor Agonists [MoA]	N0000191866	MED-RT
---Opioid kappa Receptor Agonists [MoA]	N0000194007	MED-RT
---mu-Opioid Receptor Agonist [EPC]	N0000191867	MED-RT
---Partial Opioid Agonist/Antagonist [EPC]	N0000175688	MED-RT
---Partial Opioid Agonist [EPC]	N0000175689	MED-RT
+drop    table if exists MRREL_medrt_cui9;
+create  table           MRREL_medrt_cui9
+select  distinct
+        R.CUI1   as CUI8,
+        R.REL,
+        R.RELA,
+        R.CUI2   as CUI9,
+        D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt          as R,
+        MRREL_medrt_cui8     as I,
+        MRCONSO_drug         as D
+where   R.CUI1 = I.CUI8
+and     R.CUI2 = D.CUI
+and     R.CUI2 not in (select distinct CUI from curated_cui);
+
+insert  into    curated_cui
+select  distinct 'CUI9' as tier, CUI9  as CUI, R.*
+from    MRREL_medrt_cui9 R;
+
+call create_index('MRREL_medrt_cui9', 'CUI8');
+call create_index('MRREL_medrt_cui9', 'CUI9');
+
+-- ############################################################################
+-- MRREL_medrt_cui10
+-- ############################################################################
+
+drop    table if exists MRREL_medrt_cui10;
+create  table           MRREL_medrt_cui10
+select  distinct
+        R.CUI1   as CUI9,
+        R.REL,
+        R.RELA,
+        R.CUI2   as CUI10,
+        D.SAB, D.CODE, D.TTY, D.STR
+from    MRREL_medrt          as R,
+        MRREL_medrt_cui9     as I,
+        MRCONSO_drug         as D
+where   R.CUI1 = I.CUI9
+and     R.CUI2 = D.CUI
+and     R.CUI2 not in (select distinct CUI from curated_cui);
+
+insert  into    curated_cui
+select  distinct 'CUI10' as tier, CUI10  as CUI, R.*
+from    MRREL_medrt_cui10 R;
+
+call create_index('MRREL_medrt_cui10', 'CUI9');
+call create_index('MRREL_medrt_cui10', 'CUI10');
+-- ############################################################################
+-- STATS
+-- ############################################################################
+
+drop    table   if exists   curated_cui_stat;
+create  table               curated_cui_stat
+select      count(*) as cnt, count(distinct CUI) as cnt_cui,
+            tier
+from        curated_cui
+group by    tier
+order by    tier, cnt desc, cnt_cui desc;
+
+drop    table   if exists   curated_cui_stat_rel;
+create  table               curated_cui_stat_rel
+select      count(*) as cnt, count(distinct CUI) as cnt_cui,
+            tier, REL
+from        curated_cui
+group by    tier, REL
+order by    tier, cnt desc, cnt_cui desc;
+
+drop    table   if exists   curated_cui_stat_rela;
+create  table               curated_cui_stat_rela
+select      count(*) as cnt, count(distinct CUI) cnt_cui,
+            tier, RELA
+from        curated_cui
+group by    tier, RELA
+order by    tier, cnt desc, cnt_cui desc;
+
+drop    table   if exists   curated_cui_stat_rel_rela;
+create  table               curated_cui_stat_rel_rela
+select      count(*) as cnt, count(distinct CUI) cnt_cui,
+            tier, REL, RELA
+from        curated_cui
+group by    tier, REL, RELA
+order by    tier, cnt desc, cnt_cui desc;
+
+drop    table   if exists   curated_cui_stat_tty;
+create  table               curated_cui_stat_tty
+select      count(*) as cnt, count(distinct CUI) cnt_cui,
+            tier, TTY
+from        curated_cui
+group by    tier, TTY
+order by    tier, cnt desc, cnt_cui desc;
+
+drop    table   if exists   curated_cui_stat_sab;
+create  table               curated_cui_stat_sab
+select      count(*) as cnt, count(distinct CUI) cnt_cui,
+            tier, SAB
+from        curated_cui
+group by    tier, SAB
+order by    tier, cnt desc, cnt_cui desc;
 
 
-
+-- ##############################################
+call log('MEDRT.sql', 'done');
