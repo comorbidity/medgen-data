@@ -18,6 +18,13 @@ drop table if exists    curated_cui,
                         curated_cui_stat_rela,
                         curated_cui_stat_rel_rela;
 
+--    drop    table if exists RXNCONSO_medrt
+--    create  table           RXNCONSO_medrt
+--    select * from rxnorm.RXNCONSO;
+--
+--    call create_index('RXNCONSO_medrt', 'RXCUI');
+--    call create_index('RXNCONSO_medrt', 'SAB,CODE');
+--
 --    drop    table if exists MRREL_medrt;
 --    create  table           MRREL_medrt
 --    select  *
@@ -26,8 +33,8 @@ drop table if exists    curated_cui,
 --    OR      RELA in ('isa',
 --            'tradename_of','has_tradename',
 --            'has_basis_of_strength_substance');
-
--- delete from MRREL_medrt where REL in ('RB', 'PAR');
+--
+--    delete from MRREL_medrt where REL in ('RB', 'PAR');
 
 --    not in MED-RT
 --    C0376196|Opiates
@@ -43,7 +50,6 @@ create  table           MRCONSO_medrt
 select  *
 from    umls.MRCONSO
 where   TRUE and
---        CUI in ('C0376196', 'C0242402') OR (
         SAB in ('MED-RT') AND
                 (lower(STR) like '%opioid%' OR
                  lower(STR) like '%opiate%')
@@ -63,9 +69,9 @@ select  distinct
         R.RELA,
         R.CUI2,
         R.SAB,
-        C.TTY   as TTY,
-        C.CODE  as CODE,
-        C.STR   as STR
+        C.TTY,
+        C.CODE,
+        C.STR
 from    MRREL_medrt R, MRCONSO_medrt C
 where   R.CUI1 = C.CUI;
 
@@ -127,7 +133,7 @@ order by cnt_cui2 desc, cnt_cui1 desc;
 drop    table if exists MRREL_medrt_cui2;
 create  table           MRREL_medrt_cui2
 select  distinct
-        R.CUI1, R.REL, R.RELA, R.CUI2, D.SAB, D.CODE, D.TTY, D.STR
+        R.CUI1, R.REL, R.RELA, R.CUI2, D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt_cui1 as R,
         MRCONSO_drug     as D
 where   R.CUI2 = D.CUI
@@ -151,7 +157,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI3,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt         as R,
         MRREL_medrt_cui2    as I,
         MRCONSO_drug        as D
@@ -178,7 +184,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI4,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt         as R,
         MRREL_medrt_cui3    as I,
         MRCONSO_drug        as D
@@ -204,7 +210,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI5,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt          as R,
         MRREL_medrt_cui4     as I,
         MRCONSO_drug         as D
@@ -232,7 +238,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI6,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt          as R,
         MRREL_medrt_cui5     as I,
         MRCONSO_drug         as D
@@ -258,7 +264,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI7,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt          as R,
         MRREL_medrt_cui6     as I,
         MRCONSO_drug         as D
@@ -284,7 +290,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI8,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt          as R,
         MRREL_medrt_cui7     as I,
         MRCONSO_drug         as D
@@ -310,7 +316,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI9,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt          as R,
         MRREL_medrt_cui8     as I,
         MRCONSO_drug         as D
@@ -336,7 +342,7 @@ select  distinct
         R.REL,
         R.RELA,
         R.CUI2   as CUI10,
-        D.SAB, D.CODE, D.TTY, D.STR
+        D.SAB, D.TTY, D.CODE, D.STR
 from    MRREL_medrt          as R,
         MRREL_medrt_cui9     as I,
         MRCONSO_drug         as D
@@ -350,6 +356,28 @@ from    MRREL_medrt_cui10 R;
 
 call create_index('MRREL_medrt_cui10', 'CUI9');
 call create_index('MRREL_medrt_cui10', 'CUI10');
+
+-- ############################################################################
+-- RXCUI mapping
+-- ############################################################################
+
+drop    table if exists curated_cui_rxcui;
+create  table           curated_cui_rxcui
+select  distinct        C.*, R.RXCUI
+from
+    curated_cui     as C,
+    RXNCONSO_medrt  as R
+where
+    C.SAB  = R.SAB  and
+    C.CODE = R.CODE;
+
+drop    table if exists curated;
+create  table           curated
+select  distinct        RXCUI, STR
+from    curated_cui_rxcui
+order by RXCUI, STR;
+
+
 -- ############################################################################
 -- STATS
 -- ############################################################################
