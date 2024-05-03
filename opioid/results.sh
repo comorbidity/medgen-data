@@ -25,6 +25,7 @@ ln -s $CURATED.tsv curated.tsv
 
 $mysql_table_schema < curated.sql
 $mysql_table_schema < expand.sql
+$mysql_table_schema < filter.sql
 $mysql_table_schema < stats.sql
 
 ./export_tsv.sh version
@@ -43,13 +44,13 @@ $mysql_table_schema < stats.sql
 ./export_tsv.sh curated
 ./export_tsv.sh keywords
 ./export_tsv.sh expand
-./export_tsv.sh expand_tradename
-./export_tsv.sh expand_consists
-./export_tsv.sh expand_isa
-./export_tsv.sh expand_ingredient
-./export_tsv.sh expand_doseform
-./export_tsv.sh expand_form
-./export_tsv.sh expand_other
+./export_tsv.sh filter
+./export_tsv.sh filter_tradename
+./export_tsv.sh filter_consists
+./export_tsv.sh filter_isa
+./export_tsv.sh filter_ingredient
+./export_tsv.sh filter_form
+./export_tsv.sh filter_other
 
 
 

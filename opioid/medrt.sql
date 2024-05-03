@@ -1,5 +1,5 @@
--- ##############################################
-call log('MEDRT.sql', 'begin');
+-- ############################################################################
+call log('medrt.sql', 'begin');
 
 drop table if exists    MRCONSO_medrt;
 
@@ -18,48 +18,64 @@ drop table if exists    curated_cui,
                         curated_cui_stat_rela,
                         curated_cui_stat_rel_rela;
 
---    drop    table if exists RXNCONSO_medrt
---    create  table           RXNCONSO_medrt
---    select * from rxnorm.RXNCONSO;
---
---    call create_index('RXNCONSO_medrt', 'RXCUI');
---    call create_index('RXNCONSO_medrt', 'SAB,CODE');
---
---    drop    table if exists MRREL_medrt;
---    create  table           MRREL_medrt
---    select  *
---    from    umls.MRREL
---    where   REL = 'CHD'
---    OR      RELA in ('isa',
---            'tradename_of','has_tradename',
---            'has_basis_of_strength_substance');
---
---    delete from MRREL_medrt where REL in ('RB', 'PAR');
-
---    not in MED-RT
---    C0376196|Opiates
---    C0242402|Opioids
-
--- TODO: X guard against X
--- C0027410|Narcotic Antagonists
--- C2917434|Narcotic Antitussive
--- C2916808|NMDA Receptor Antagonists
+-- ############################################################################
+call log('MRCONSO_medrt', 'refresh');
 
 drop    table if exists MRCONSO_medrt;
 create  table           MRCONSO_medrt
 select  *
 from    umls.MRCONSO
-where   TRUE and
-        SAB in ('MED-RT') AND
-                (lower(STR) like '%opioid%' OR
-                 lower(STR) like '%opiate%')
+where   SAB in ('MED-RT')
+and     (   lower(STR) like '%opioid%' OR
+            lower(STR) like '%opiate%')
 order by STR,TTY;
 
 call create_index('MRCONSO_medrt', 'CUI');
 
 -- ############################################################################
--- MRREL_medrt_cui1
+call log('MRCONSO_drug', 'refresh');
+
+drop    table if exists MRCONSO_drug;
+create  table           MRCONSO_drug
+select  *
+from    umls.MRCONSO
+where   SAB IN
+    ('ATC',
+    'CVX',
+    'DRUGBANK',
+    'GS',
+    'MMSL',
+    'MMX',
+    'MTHCMSFRF',
+    'MTHSPL',
+    'NDDF',
+    'RXNORM',
+    'SNOMEDCT_US',
+    'USP',
+    'VANDF');
+
+call create_index('MRCONSO_drug', 'CUI');
+call create_index('MRCONSO_drug', 'SAB');
+call create_index('MRCONSO_drug', 'CODE');
+call create_index('MRCONSO_drug', 'TTY');
+
 -- ############################################################################
+call log('MRREL_medrt', 'refresh');
+
+drop    table if exists MRREL_medrt;
+create  table           MRREL_medrt
+select  *
+from    umls.MRREL
+where   REL = 'CHD'
+OR      RELA in ('isa',
+        'tradename_of','has_tradename',
+        'has_basis_of_strength_substance');
+
+delete from MRREL_medrt where REL in ('RB', 'PAR');
+
+
+-- ############################################################################
+call log('MRREL_medrt_cui1', 'refresh');
 
 drop    table if exists MRREL_medrt_cui1;
 create  table           MRREL_medrt_cui1
@@ -93,7 +109,6 @@ select  count(distinct CUI1) as cnt_cui1,
         count(distinct CUI2) as cnt_cui2,
         REL, RELA, TTY
 from    MRREL_medrt_cui1
-where   CUI1 != CUI2
 group by REL,RELA, TTY
 order by cnt_cui2 desc, cnt_cui1 desc;
 
@@ -127,8 +142,7 @@ order by cnt_cui2 desc, cnt_cui1 desc;
 
 
 -- ############################################################################
--- MRREL_medrt_cui2
--- ############################################################################
+call log('MRREL_medrt_cui2', 'refresh');
 
 drop    table if exists MRREL_medrt_cui2;
 create  table           MRREL_medrt_cui2
@@ -147,8 +161,7 @@ select  distinct 'CUI2' as tier, CUI2  as CUI, R.*
 from    MRREL_medrt_cui2 R;
 
 -- ############################################################################
--- MRREL_medrt_cui3
--- ############################################################################
+call log('MRREL_medrt_cui3', 'refresh');
 
 drop    table if exists MRREL_medrt_cui3;
 create  table           MRREL_medrt_cui3
@@ -173,8 +186,7 @@ select  distinct 'CUI3' as tier, CUI3  as CUI, R.*
 from    MRREL_medrt_cui3 R;
 
 -- ############################################################################
--- MRREL_medrt_cui4
--- ############################################################################
+call log('MRREL_medrt_cui4', 'refresh');
 
 -- relate
 drop    table if exists MRREL_medrt_cui4;
@@ -200,8 +212,7 @@ select  distinct 'CUI4' as tier, CUI4  as CUI, R.*
 from    MRREL_medrt_cui4 R;
 
 -- ############################################################################
--- MRREL_medrt_cui5
--- ############################################################################
+call log('MRREL_medrt_cui5', 'refresh');
 
 drop    table if exists MRREL_medrt_cui5;
 create  table           MRREL_medrt_cui5
@@ -228,8 +239,7 @@ call create_index('MRREL_medrt_cui5', 'CUI4');
 call create_index('MRREL_medrt_cui5', 'CUI5');
 
 -- ############################################################################
--- MRREL_medrt_cui6
--- ############################################################################
+call log('MRREL_medrt_cui6', 'refresh');
 
 drop    table if exists MRREL_medrt_cui6;
 create  table           MRREL_medrt_cui6
@@ -254,8 +264,7 @@ call create_index('MRREL_medrt_cui6', 'CUI5');
 call create_index('MRREL_medrt_cui6', 'CUI6');
 
 -- ############################################################################
--- MRREL_medrt_cui7
--- ############################################################################
+call log('MRREL_medrt_cui7', 'refresh');
 
 drop    table if exists MRREL_medrt_cui7;
 create  table           MRREL_medrt_cui7
@@ -280,8 +289,7 @@ call create_index('MRREL_medrt_cui7', 'CUI6');
 call create_index('MRREL_medrt_cui7', 'CUI7');
 
 -- ############################################################################
--- MRREL_medrt_cui8
--- ############################################################################
+call log('MRREL_medrt_cui8', 'refresh');
 
 drop    table if exists MRREL_medrt_cui8;
 create  table           MRREL_medrt_cui8
@@ -306,8 +314,7 @@ call create_index('MRREL_medrt_cui8', 'CUI7');
 call create_index('MRREL_medrt_cui8', 'CUI8');
 
 -- ############################################################################
--- MRREL_medrt_cui9
--- ############################################################################
+call log('MRREL_medrt_cui9', 'refresh');
 
 drop    table if exists MRREL_medrt_cui9;
 create  table           MRREL_medrt_cui9
@@ -332,8 +339,7 @@ call create_index('MRREL_medrt_cui9', 'CUI8');
 call create_index('MRREL_medrt_cui9', 'CUI9');
 
 -- ############################################################################
--- MRREL_medrt_cui10
--- ############################################################################
+call log('MRREL_medrt_cui10', 'refresh');
 
 drop    table if exists MRREL_medrt_cui10;
 create  table           MRREL_medrt_cui10
@@ -359,14 +365,16 @@ call create_index('MRREL_medrt_cui10', 'CUI10');
 
 -- ############################################################################
 -- RXCUI mapping
+
 -- ############################################################################
+call log('curated_cui_rxcui', 'refresh');
 
 drop    table if exists curated_cui_rxcui;
 create  table           curated_cui_rxcui
 select  distinct        C.*, R.RXCUI
 from
     curated_cui     as C,
-    RXNCONSO_medrt  as R
+    rxnorm.RXNCONSO  as R
 where
     C.SAB  = R.SAB  and
     C.CODE = R.CODE;
@@ -381,6 +389,7 @@ order by RXCUI, STR;
 -- ############################################################################
 -- STATS
 -- ############################################################################
+call log('curated_cui_stat', '*');
 
 drop    table   if exists   curated_cui_stat;
 create  table               curated_cui_stat
@@ -430,6 +439,5 @@ from        curated_cui
 group by    tier, SAB
 order by    tier, cnt desc, cnt_cui desc;
 
-
 -- ##############################################
-call log('MEDRT.sql', 'done');
+call log('medrt.sql', 'done');
