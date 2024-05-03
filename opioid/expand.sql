@@ -1,129 +1,92 @@
 -- ##############################################
 call log('expand.sql', 'begin');
 
-drop    table if exists expand;
-create  table expand
+-- ##############################################
+call log('expand_relax', 'refresh');
+
+drop    table if exists expand_relax;
+create  table           expand_relax
 select  distinct
-        C1.RXCUI,   C2.RXCUI    as RXCUI2,
-        C1.TTY,     C2.TTY      as TTY2,
+        C1.RXCUI    as RXCUI1,
+        C2.RXCUI    as RXCUI2,
+        C1.TTY      as TTY1,
+        C2.TTY      as TTY2,
+        C1.RUI,
         C1.REL,
         C1.RELA,
-        C1.STR,     C2.STR      as STR2
-from    RXNCONSO_curated_rela C1, rxnorm.RXNCONSO C2
+        C1.STR      as STR1,
+        C2.keyword_str,
+        C2.keyword_len,
+        C2.STR      as STR2
+from    RXNCONSO_curated_rela C1, all_rxcui_str.RXNCONSO_curated C2
 where   C1.RXCUI2 = C2.RXCUI
 and     C1.RXCUI2 NOT in (select distinct RXCUI from RXNCONSO_curated);
 
-call create_index('expand','RXCUI');
-call create_index('expand','RXCUI2');
-call create_index('expand','REL');
-call create_index('expand','RELA');
-call create_index('expand','TTY');
+call create_index('expand_relax','RXCUI1');
+call create_index('expand_relax','RXCUI2');
+call create_index('expand_relax','REL');
+call create_index('expand_relax','RELA');
+call create_index('expand_relax','TTY1');
+call create_index('expand_relax','TTY2');
 
 -- ##############################################
-call log('expand_cui2_str2', 'refresh');
+call log('expand_strict', 'refresh');
 
-drop    table if exists expand_cui2_str2;
-create  table           expand_cui2_str2
+drop    table if exists expand_strict;
+create  table           expand_strict
+select  distinct        relax.*, rules.include, rules.rule
+from    expand_relax as relax,
+        expand_rules as rules
+where   relax.REL not in ('RB', 'PAR')
+and     rules.include is not FALSE
+and   ((rules.include is TRUE) or (relax.keyword_len >1))
+and     rules.TTY1 = relax.TTY1
+and     rules.TTY2 = relax.TTY2
+and     rules.RELA = relax.RELA;
+
+drop    table if exists expand_strict_rxcui_str;
+create  table           expand_strict_rxcui_str
+select  distinct        RXCUI2, STR2
+from    expand_strict
+order by RXCUI2, STR2;
+
+-- ##############################################
+call log('expand_keywords', 'refresh');
+
+drop    table if exists expand_keywords;
+create  table           expand_keywords
+select  distinct        relax.*
+from    expand_relax as relax
+where   relax.REL not in ('RB', 'PAR')
+and     relax.keyword_len >1;
+
+drop    table if exists expand_keywords_rxcui_str;
+create  table           expand_keywords_rxcui_str
+select  distinct        RXCUI2, STR2
+from    expand_keywords
+order by RXCUI2, STR2;
+
+-- ##############################################
+call log('expand', 'refresh');
+
+drop    table if exists expand;
+create  table           expand
+select distinct *
+from expand_strict
+        UNION
+select distinct *, NULL as include,'?' as rule
+from expand_keywords;
+
+-- ##############################################
+call log('expand_rxcui_str', 'refresh');
+
+drop    table if exists expand_rxcui_str;
+create  table           expand_rxcui_str
 select  distinct        RXCUI2, STR2
 from    expand
 order by RXCUI2, STR2 ;
 
-call create_index('expand_cui2_str2','RXCUI2');
-
--- ##############################################
-call log('expand_tradename', 'refresh');
-
-drop    table if exists expand_tradename;
-create  table           expand_tradename
-select  distinct        RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from    expand
-where   RELA in         ('has_tradename', 'tradename_of')
-order by                RELA, RXCUI2, STR2 ;
-
-call create_index('expand_tradename','RXCUI2');
-
--- ##############################################
-call log('expand_consists', 'refresh');
-
-drop    table if exists expand_consists;
-create  table           expand_consists
-select  distinct        RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from    expand
-where   RELA in         ('consists_of', 'constitutes')
-order by RELA, RXCUI2, STR2 ;
-
-call create_index('expand_consists','RXCUI2');
-
--- ##############################################
-call log('expand_isa', 'refresh');
-
-drop    table if exists expand_isa;
-create  table           expand_isa
-select  distinct        RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from    expand
-where RELA in           ('isa', 'inverse_isa')
-order by RELA, RXCUI2, STR2 ;
-
-call create_index('expand_isa','RXCUI2');
-
--- ##############################################
-call log('expand_ingredient', 'refresh');
-
-drop    table if exists expand_ingredient;
-create  table           expand_ingredient
-select  distinct        RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from expand
-where RELA in           ('has_ingredient',          'ingredient_of',
-                         'has_precise_ingredient',  'precise_ingredient_of',
-                         'has_ingredients',         'ingredients_of')
-order by RELA, RXCUI2, STR2 ;
-
-call create_index('expand_ingredient','RXCUI2');
-
--- ##############################################
-call log('expand_doseform', 'refresh');
-
-drop    table if exists     expand_doseform;
-create  table               expand_doseform
-select  distinct            RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from    expand
-where   RELA in             ('dose_form_of',     'has_dose_form',
-                             'doseformgroup_of', 'has_doseformgroup')
-order by RELA, RXCUI2, STR2 ;
-
-call create_index('expand_doseform ','RXCUI2');
-
--- ##############################################
-call log('expand_form', 'refresh');
-
-drop    table if exists expand_form;
-create  table           expand_form
-select  distinct        RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from    expand
-where   RELA in         ('form_of', 'has_form')
-order by RELA, RXCUI2, STR2 ;
-
-call create_index('expand_form ','RXCUI2');
-
--- ##############################################
-call log('expand_other', 'refresh');
-
-drop    table if exists expand_other;
-create  table           expand_other
-select  distinct        RXCUI, TTY, RELA, RXCUI2, TTY2, STR2
-from    expand
-where   RELA NOT IN     ('has_tradename',            'tradename_of',
-                         'consists_of',              'constitutes',
-                         'isa',                      'inverse_isa',
-                         'has_ingredient',           'ingredient_of',
-                         'has_precise_ingredient',   'precise_ingredient_of',
-                         'has_ingredients',          'ingredients_of',
-                         'dose_form_of',             'has_dose_form',
-                         'doseformgroup_of',         'has_doseformgroup',
-                         'form_of',                  'has_form')
-order by RELA, RXCUI2, STR2 ;
-
-call create_index('expand_form','RXCUI2');
+call create_index('expand_rxcui_str','RXCUI2');
 
 -- ##############################################
 call log('expand.sql', 'done.');

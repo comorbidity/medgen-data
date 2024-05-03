@@ -47,14 +47,15 @@ create  table               RXNCONSO_curated
     STR     varchar(3000)   NOT NULL,
     TTY     varchar(20)     NOT NULL,
     SAB     varchar(20)     NOT NULL,
+    CODE    varchar(50)     NOT NULL,
     keyword_str varchar(50) NULL,
     keyword_len int         NULL
 );
 
 insert  into RXNCONSO_curated
-        ( RXCUI,      STR,   TTY,   SAB )
+        ( RXCUI,   STR,   TTY,   SAB,   CODE)
 select  distinct
-        C.RXCUI,    C.STR, C.TTY, C.SAB
+        C.RXCUI, C.STR, C.TTY, C.SAB, C.CODE
 from    rxnorm.RXNCONSO as C, curated
 where   C.RXCUI = curated.RXCUI
 order by RXCUI,STR;
@@ -103,12 +104,11 @@ select  distinct
         C.STR,
         C.TTY,
         C.SAB,
-        C.RXAUI,
-        C.SAUI,
         R.RXCUI2,
         R.REL,
-        R.RELA
-from    rxnorm.RXNCONSO as C,
+        R.RELA,
+        R.RUI
+from    RXNCONSO_curated as C,
         RXNREL_curated as R
 where   R.RXCUI1 = C.RXCUI;
 

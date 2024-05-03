@@ -56,7 +56,7 @@ order by cnt_rxcui desc;
 drop    table if exists stats_expand;
 create  table           stats_expand as
 select  count(*)                as cnt_star,
-        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI1)   as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2
 from    expand;
 
@@ -65,7 +65,7 @@ from    expand;
 drop    table if exists stats_expand_rel;
 create  table           stats_expand_rel as
 select  count(*)                as cnt_star,
-        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI1)  as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2,
         U.REL, U.REL_STR
 from    expand E, umls_rel U
@@ -78,7 +78,7 @@ order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 drop    table if exists stats_expand_rela;
 create  table           stats_expand_rela as
 select  count(*)                as cnt_star,
-        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI1)  as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2,
         RELA
 from    expand E
@@ -90,13 +90,13 @@ order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 drop    table if exists stats_expand_rel_tty;
 create  table           stats_expand_rel_tty as
 select  count(*) as cnt_star,
-        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI1)   as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2,
         REL,
-        TTY,
+        TTY1,
         TTY2
 from    expand E
-group by REL, TTY, TTY2
+group by REL, TTY1, TTY2
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
 -- ############################################## (expand)
@@ -104,13 +104,13 @@ order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 drop    table if exists stats_expand_rela_tty;
 create  table           stats_expand_rela_tty as
 select  count(*) as cnt_star,
-        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI1)  as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2,
         RELA,
-        TTY,
+        TTY1,
         TTY2
 from    expand E
-group by RELA, TTY, TTY2
+group by RELA, TTY1, TTY2
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
 
@@ -119,14 +119,14 @@ order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 drop    table if exists stats_expand_rel_rela_tty;
 create  table           stats_expand_rel_rela_tty as
 select  count(*) as cnt_star,
-        count(distinct RXCUI)   as cnt_rxcui1,
+        count(distinct RXCUI1)  as cnt_rxcui1,
         count(distinct RXCUI2)  as cnt_rxcui2,
         REL,
         RELA,
-        TTY,
+        TTY1,
         TTY2
 from    expand E
-group by REL, RELA, TTY, TTY2
+group by REL, RELA, TTY1, TTY2
 order by cnt_rxcui1 desc, cnt_rxcui2 desc;
 
 -- ##############################################
