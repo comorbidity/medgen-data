@@ -3,7 +3,13 @@ set -e
 source db.config
 source env_table_schema.sh
 
+export CURATED="custom_rxcui_str"
+./drop_database.sh
+
 export CURATED="vsac_math"
+./drop_database.sh
+
+export CURATED="medrt"
 ./drop_database.sh
 
 export CURATED="bioportal"
@@ -15,11 +21,8 @@ export CURATED="bioportal_to_umls"
 export CURATED="wasz_april7"
 ./drop_database.sh
 
-export CURATED="custom_rxcui_str"
-./drop_database.sh
-
-export CURATED="all_rxcui_str"
-./drop_database.sh
+#export CURATED="all_rxcui_str"
+#./drop_database.sh
 
 export CURATED="opioid"
 ./drop_database.sh

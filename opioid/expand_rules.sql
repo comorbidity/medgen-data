@@ -13,7 +13,7 @@ create  table           expand_rules
 call log('infile', 'expand_rules.tsv');
 
 load    data
-local   infile     'expand_rules.tsv'
+local   infile     'infile/expand_rules.tsv'
 into    table       expand_rules
         fields      terminated by '\t'
         optionally  enclosed by '"' ESCAPED BY ''

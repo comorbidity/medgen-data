@@ -12,12 +12,7 @@ call log('infile', 'curated.tsv');
 
 load    data
 local   infile     'curated.tsv'
-into    table       curated
-        fields      terminated by '\t'
-        optionally  enclosed by '"' ESCAPED BY ''
-        lines       terminated by '\n'
-        ignore 1 lines;
-
+into    table       curated;
 show warnings; 
 
 call create_index('curated','RXCUI');
@@ -34,8 +29,8 @@ select  distinct
 from    curated_orig
 order by trim(STR);
 
-call create_index('curated','RXCUI');
-call create_index('curated','STR(255)');
+-- if header was provided, remove header row.
+delete from curated where RXCUI ='RXCUI';
 
 -- ##############################################
 call log('RXNCONSO_curated', 'refresh'); 

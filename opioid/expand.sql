@@ -34,21 +34,15 @@ call log('expand_strict', 'refresh');
 
 drop    table if exists expand_strict;
 create  table           expand_strict
-select  distinct        relax.*, rules.include, rules.rule
+select  distinct        relax.*
 from    expand_relax as relax,
         expand_rules as rules
 where   relax.REL not in ('RB', 'PAR')
-and     rules.include is not FALSE
-and   ((rules.include is TRUE) or (relax.keyword_len >1))
+and     rules.include is TRUE
 and     rules.TTY1 = relax.TTY1
 and     rules.TTY2 = relax.TTY2
 and     rules.RELA = relax.RELA;
 
-drop    table if exists expand_strict_rxcui_str;
-create  table           expand_strict_rxcui_str
-select  distinct        RXCUI2, STR2
-from    expand_strict
-order by RXCUI2, STR2;
 
 -- ##############################################
 call log('expand_keywords', 'refresh');
@@ -56,9 +50,26 @@ call log('expand_keywords', 'refresh');
 drop    table if exists expand_keywords;
 create  table           expand_keywords
 select  distinct        relax.*
-from    expand_relax as relax
-where   relax.REL not in ('RB', 'PAR')
-and     relax.keyword_len >1;
+from    expand_relax as relax,
+        expand_rules as rules
+where   rules.include is NULL
+and     relax.REL not in ('RB', 'PAR')
+and     relax.keyword_len >1
+and     rules.TTY1 = relax.TTY1
+and     rules.TTY2 = relax.TTY2
+and     rules.RELA = relax.RELA;
+
+-- ##############################################
+call log('expand', 'refresh');
+
+drop    table if exists expand;
+create  table           expand
+select  distinct * from expand_strict
+        UNION
+select distinct * from expand_keywords;
+
+-- ##############################################
+call log('expand_rxcui_str', 'refresh');
 
 drop    table if exists expand_keywords_rxcui_str;
 create  table           expand_keywords_rxcui_str
@@ -66,27 +77,19 @@ select  distinct        RXCUI2, STR2
 from    expand_keywords
 order by RXCUI2, STR2;
 
--- ##############################################
-call log('expand', 'refresh');
-
-drop    table if exists expand;
-create  table           expand
-select distinct *
-from expand_strict
-        UNION
-select distinct *, NULL as include,'?' as rule
-from expand_keywords;
-
--- ##############################################
-call log('expand_rxcui_str', 'refresh');
+drop    table if exists expand_strict_rxcui_str;
+create  table           expand_strict_rxcui_str
+select  distinct        RXCUI2, STR2
+from    expand_strict
+order by RXCUI2, STR2;
 
 drop    table if exists expand_rxcui_str;
 create  table           expand_rxcui_str
-select  distinct        RXCUI2, STR2
-from    expand
+select  distinct        RXCUI2, STR2 from  expand_strict_rxcui_str
+UNION
+select  distinct        RXCUI2, STR2 from  expand_keywords_rxcui_str
 order by RXCUI2, STR2 ;
 
 call create_index('expand_rxcui_str','RXCUI2');
-
 -- ##############################################
 call log('expand.sql', 'done.');

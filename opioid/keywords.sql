@@ -13,13 +13,8 @@ create table keywords(
 call log('keywords.tsv', 'infile');
 
 load    data
-local   infile          'keywords.tsv'
-into    table            keywords
-        fields           terminated by '\t'
-        optionally       enclosed by '"' ESCAPED BY ''
-        lines            terminated by '\n'
-        ignore 1 lines;
-
+local   infile          'infile/common/keywords.tsv'
+into    table            keywords;
 show warnings;
 
 -- #############################################################################

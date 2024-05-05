@@ -13,20 +13,22 @@ echo ###########################################################################
 ./create_database.sh opioid
 
 export CURATED="custom_rxcui_str"
-./make.sh
+./make_recursive.sh
 
 export CURATED="vsac_math"
-./make.sh
+./make_recursive.sh
+
+export CURATED="medrt"
+./make_recursive.sh
 
 export CURATED="bioportal"
-./make.sh
+./make_recursive.sh
 
-export CURATED="bioportal_to_umls"
-./make.sh
+#  export CURATED="bioportal_to_umls"
+#  ./make_recursive.sh
 
 export CURATED="wasz_april7"
-./make.sh
+./make_recursive.sh
 
-export CURATED="all_rxcui_str"
-./make.sh
-
+#  export CURATED="all_rxcui_str"
+#  ./make_recursive.sh

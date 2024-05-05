@@ -12,7 +12,7 @@ create table umls_tui
  TUI_STR    varchar(50) NOT NULL
 );    
 
-load data local infile 'UMLS_TUI.tsv' into table umls_tui ignore 1 lines;
+load data local infile 'infile/common/umls_tui.tsv' into table umls_tui ignore 1 lines;
 show warnings; 
 
 call create_index('umls_tui','TUI');
@@ -27,7 +27,7 @@ create table umls_tty
  TTY_STR    varchar(80) NOT NULL
 );    
 
-load data local infile 'UMLS_TTY.tsv'  into table umls_tty  ignore 1 lines;
+load data local infile 'infile/common/umls_tty.tsv'  into table umls_tty  ignore 1 lines;
 show warnings;
 
 call create_index('umls_tty','TTY');
@@ -42,7 +42,7 @@ create table umls_rel
  REL_STR    varchar(70) NOT NULL
 );    
 
-load data local infile 'UMLS_REL.tsv' into table umls_rel ignore 1 lines;
+load data local infile 'infile/common/umls_rel.tsv' into table umls_rel ignore 1 lines;
 show warnings;
 
 call create_index('umls_rel','REL');
@@ -57,7 +57,7 @@ create table umls_rela
  RELA_STR   varchar(100) 	NULL
 );    
 
-load data local infile 'UMLS_RELA.tsv' into table umls_rela ignore 1 lines;
+load data local infile 'infile/common/umls_rela.tsv' into table umls_rela ignore 1 lines;
 show warnings;
 
 call create_index('umls_rela','RELA');

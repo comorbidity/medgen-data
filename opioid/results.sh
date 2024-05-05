@@ -21,7 +21,7 @@ echo "Using $CURATED.tsv"
 $mysql_table_schema -e "call version('${CURATED}', 'results.sh:begin')"
 
 rm -f curated.tsv
-ln -s $CURATED.tsv curated.tsv
+ln -s infile/$CURATED.tsv curated.tsv
 
 $mysql_table_schema < curated.sql
 $mysql_table_schema < expand.sql
@@ -30,32 +30,28 @@ $mysql_table_schema < stats.sql
 
 ./export_tsv.sh version
 
-./export_tsv.sh stats_keywords
-./export_tsv.sh stats_sab
-./export_tsv.sh stats_tty
-./export_tsv.sh stats_tui
-./export_tsv.sh stats_expand
-./export_tsv.sh stats_expand_rel
-./export_tsv.sh stats_expand_rel_tty
-./export_tsv.sh stats_expand_rela
-./export_tsv.sh stats_expand_rela_tty
-./export_tsv.sh stats_expand_rel_rela_tty
+#./export_tsv.sh stats_keywords
+#./export_tsv.sh stats_sab
+#./export_tsv.sh stats_tty
+#./export_tsv.sh stats_tui
+#./export_tsv.sh stats_expand
+#./export_tsv.sh stats_expand_rel
+#./export_tsv.sh stats_expand_rel_tty
+#./export_tsv.sh stats_expand_rela
+#./export_tsv.sh stats_expand_rela_tty
+#./export_tsv.sh stats_expand_rel_rela_tty
 
 ./export_tsv.sh curated
 ./export_tsv.sh keywords
 ./export_tsv.sh expand
-./export_tsv.sh filter
-./export_tsv.sh filter_tradename
-./export_tsv.sh filter_consists
-./export_tsv.sh filter_isa
-./export_tsv.sh filter_ingredient
-./export_tsv.sh filter_form
-./export_tsv.sh filter_other
-
-
-
-
-
+./export_tsv.sh expand_rxcui_str
+#./export_tsv.sh filter
+#./export_tsv.sh filter_tradename
+#./export_tsv.sh filter_consists
+#./export_tsv.sh filter_isa
+#./export_tsv.sh filter_ingredient
+#./export_tsv.sh filter_form
+#./export_tsv.sh filter_other
 
 $mysql_table_schema -e "call version('${CURATED}', 'results.sh:done')"
 $mysql_table_schema -e "call log('results.sh', 'done')"
